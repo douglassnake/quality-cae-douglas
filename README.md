@@ -60,6 +60,31 @@ Eles devem ser tratados como entrada opcional, e não como requisito para funcio
 
 Documentos de clientes e arquivos potencialmente confidenciais não devem ser publicados neste repositório público sem autorização explícita.
 
+## Motor de Similaridade e Conhecimento
+
+A primeira evolução sobre a base recuperada está disponível em:
+
+```text
+app/knowledge.html
+```
+
+O módulo trabalha em **modo de recomendação** e utiliza somente os campos estruturados que já existem na recuperação V6. Ele oferece:
+
+- seleção de projeto de referência;
+- Top 5 ou Top 10 projetos históricos relacionados;
+- score de similaridade explicado por dimensão;
+- classificação do nível de similaridade;
+- indicação das diferenças e limitações do score;
+- sinais de Checklist e Gates que merecem revisão documental.
+
+O módulo não cria fatos técnicos ausentes, não presume não conformidade por ausência documental e não altera automaticamente Checklist ou Gates.
+
+A metodologia está documentada em:
+
+```text
+docs/SIMILARITY_ENGINE.md
+```
+
 ## Objetivos da plataforma
 
 - consolidar projetos históricos de engenharia;
@@ -68,7 +93,7 @@ Documentos de clientes e arquivos potencialmente confidenciais não devem ser pu
 - vincular evidências a documentos, páginas e revisões quando disponíveis;
 - registrar lições aprendidas;
 - apoiar novos projetos utilizando conhecimento histórico;
-- evoluir para motor de similaridade e reuso de conhecimento.
+- evoluir o motor de similaridade e reuso de conhecimento conforme novas evidências fiquem disponíveis.
 
 ## Estrutura do repositório
 
