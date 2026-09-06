@@ -1,38 +1,19 @@
-<!doctype html>
-<html lang="pt-BR">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Q-SIM — Plataforma de Qualidade CAE</title>
-<style>
-html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#f6f7f9;color:#1e293b}.loading{min-height:100vh;display:grid;place-items:center}.box{max-width:720px;margin:24px;padding:28px;background:#fff;border:1px solid #d8dee8;border-radius:10px}.bar{height:8px;border-radius:999px;background:#e5e7eb;overflow:hidden;margin-top:18px}.bar i{display:block;height:100%;width:45%;background:#0f766e;animation:load 1.2s infinite alternate}@keyframes load{to{width:90%}}.muted{color:#64748b;font-size:13px;line-height:1.5}</style>
-</head>
-<body>
-<div class="loading"><div class="box"><h2>Q-SIM</h2><p>Carregando a base histórica recuperada...</p><p class="muted">Snapshot preservado da V6. A versão V7/V8 original não está disponível nos arquivos recuperados e não é simulada por esta publicação.</p><div class="bar"><i></i></div></div></div>
+<!doctype html><html lang="pt-BR"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Q-SIM Recovery</title><style>
+:root{--bg:#f6f7f9;--p:#fff;--ink:#1e293b;--mut:#64748b;--b:#164e63;--a:#0f766e;--line:#d8dee8;--w:#b45309}
+*{box-sizing:border-box}body{margin:0;font:14px Arial;background:var(--bg);color:var(--ink)}header{background:var(--b);color:#fff;padding:16px 22px;border-bottom:4px solid var(--a)}header h1{margin:0;font-size:21px}header small{color:#d9fbf6}.layout{display:grid;grid-template-columns:240px 1fr;min-height:calc(100vh - 72px)}aside{background:#0f2f3b;padding:12px}aside button{width:100%;border:0;background:transparent;color:#e6f6f4;text-align:left;padding:10px;border-radius:6px;cursor:pointer}aside button:hover,aside button.on{background:#176b73}main{padding:18px}section{display:none}section.on{display:block}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:12px}.card{background:#fff;border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px}.kpi b{display:block;font-size:28px;color:var(--b)}.small{font-size:12px;color:var(--mut)}input,select{padding:8px;border:1px solid #cbd5e1;border-radius:6px}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:#eef2f7}.badge{display:inline-block;padding:3px 8px;border-radius:999px;background:#e0f2f1;color:#115e59;font-size:11px;font-weight:bold;margin:1px}.warn{background:#fef3c7;color:#92400e}.click{color:var(--a);font-weight:bold;cursor:pointer}.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px;border-radius:7px;margin-bottom:12px}@media(max-width:900px){.layout{grid-template-columns:1fr}aside{display:flex;overflow:auto}}
+</style></head><body><header><h1>Q-SIM — Base de Conhecimento e Qualidade</h1><small>Recuperação funcional do snapshot V6</small></header><div class="layout"><aside>
+<button class="on" data-s="dash">Dashboard</button><button data-s="proj">Projetos</button><button data-s="qual">Checklist e Gates</button><button data-s="docs">Documentos</button></aside><main>
+<div class="notice">Os relatórios/propostas originais não estão disponíveis. Esta publicação preserva somente dados estruturados já existentes na V6 e não é rotulada como V7/V8.</div>
+<section id="dash" class="on"></section><section id="proj"></section><section id="qual"></section><section id="docs"></section></main></div>
 <script>
-(async()=>{
-  try{
-    const parts=[];
-    for(let i=0;i<10;i++){
-      const name=`data/v6.gz.b64.part${String(i).padStart(2,'0')}`;
-      const r=await fetch(name,{cache:'no-store'});
-      if(!r.ok) throw new Error(`Falha ao carregar ${name}: ${r.status}`);
-      parts.push((await r.text()).trim());
-    }
-    const b64=parts.join('');
-    const binary=atob(b64);
-    const bytes=new Uint8Array(binary.length);
-    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
-    if(!('DecompressionStream' in window)) throw new Error('Navegador sem suporte a DecompressionStream/gzip.');
-    const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
-    const html=await new Response(stream).text();
-    document.open();
-    document.write(html);
-    document.close();
-  }catch(err){
-    document.body.innerHTML=`<div class="loading"><div class="box"><h2>Q-SIM</h2><p>Não foi possível abrir o snapshot recuperado.</p><pre style="white-space:pre-wrap">${String(err)}</pre></div></div>`;
-  }
-})();
-</script>
-</body>
-</html>
+const P="H4sIANn4nWoC/+2b3XLiNhTHX8XDdZRasiGwdwqYhKn5qCHZdjI7GRecXXcNZmyT3U6nT9OLPsi+WI9k2fhDBkOzm92Em8RIR8b4/9M5R8fy3V8Nt/GmQQ1r3DcNY4ZUTNQOUXGrcdaYZ3vgs914w3rOGiF0TJzVwllFjrJwlEfbcxf23PbBKGq8uWt0aQ8Ou332t+eu7KU7t+HQGA5+MoZdOOp7G3fhLzJdn9eeO3cjdtw3aOPdWeMTOxMdTX+bKt3+r9AeHw+d+Qd7BaM89hV0NqDwf+rDFbz1g48hG/keRt41rujMUFQFKcZoZtEeM0suGoxEP4b+iWVMqEW7dCw1IWAyHPcMU96tQfd0bN5UDdeh/5aag17lFzTFNRpX+WuEX/IRfglWz3ALjhfsfkwCf+2Hkc1u+8SzVz47mAX277b3wYfzUCfw+57jREhJpUTmtHu+8Oef2dmPHH//SM7Xi4fGu7/PisiASRtNjFEPfoOBssDIAWrHAHX91ZxTsAeaEiozJ+BHZURenvQ4I72KFcvx7MgPXJ/r9MB0UvpwkV1/ufacJYxls5ALdVbfXqrtiMKVI4101BZRSTOjJu9J1CTNA9U0qEzTa3cRyDTO+gxwEU7g8otmU98Io2ATbYL4Q+o+8lTQX97S1HPEXmS6tudO17Pd5TPzQteB/2gvfGXuL5XACUPbe7TDr0XP3omfKAvHoDpSW4ipC5+Y94iJSnG679OpQcqjYlbiMfeW83iuS0dqNUaS0shJ4HjuEhgJ+Enw7pPkib4cjGdGF2FdUy/ARhU4x80py+phLOcIrAC7BshDfwH/awa874ber+3t9vBaFBRJKK02KnHR0jD0EyznAj9RxNoBQYxP3g2ekDgKiZaGsMqcF94JRSI5M0LO6tFlrthBS9v1EPg/cYo8LlfGdDJA5KLNedIFLbw1hUWvAYvEc1Qwsk2K81Dl2cjxkIxSen9y4/ClM3JIfsy1gv+phtL4JjOMwwr8ZdEJx/n0FgzTUoCq6xi7NBm24CTj6YwmoAiromM5Zi21N4WKwwrP+CM/ctf2e2dZmT1nAHrZPsRyQsHH5hHucwiJV6L5gx06CkFMpAhuB8JY+WOzUiRewLQQbsbuQ91Ke3QaIYsEO2LIEUHiNSW6W0/fH4xgCdMHWTHKacZdfjyNi9FhO4aUx7DE1A1tWE0piGiMDvApZT5M2jUQ1ggmsNrtCEBYY7oE7uwkpCrFlIKSTPMtHyLEiChySiLuMKkfIPLaSROIsgmCG2AOhoCOhTQZC80LjDPOIsvCHm+xe7lRJXqZlaI7kS06TkBUApEIGHsO4xbR8sKWe46yuYyHi5aqQz+R8UB28nA8BD+C1t82UgypeU3ZL6hDwEULqTpL70gSPeJIcP7ZC2sUVvecROZjjNHVlhQkck8jCVpbom5GN1OkXvA4hdsJUqz1oJLrrlBTrM7XX4689GwyFSyvQuIn7qlUrI6m5nKDnFidAxcFmfkuL4keqtlpuZjO2rxcZXc+pBD5zQEipMVXiZpQVLSnTl17lsqifElYnRHCd8DQ7zxB/Pox4oDsIKM/TH7m2TW+ULh1gnNZVUHYs7pCQkyhriDHS+vwhOL58ZI+ZanL0KkyVYMkrYMwTknazVCChXhuwlPQQmUqPa+uswXLCaFXgJCuI0y2zog5lsvdICVwJCCBiF4VSE2N7QxIq99FkPQTSC8GpKaGVO6LdKWqTp6BKAFD2BbwmU0RVjss5qV5L7TVLIntX6LE6MirXqfHZTKRs4JIC10li9JGEWYBfoMvUbWyqLWCisQBlGuadQtbpyLHERSAgqIsoVVxwBPW1Eq2wyI+kca3YJxQ+HFR0MTOHy19SHJZCURqKwNiRG8H3fEI4XYMRVLsFO01652lrWM7qp2V0eEUDe4auC0WqARthQQtchIlmifPxfYQk5FYkEDKJZLtzlC9TXTSpoaRkGD7issu2X0ANWAWrPxQgaxhw2Tzw5iQ1cbzahTExpso8BOhX5ySzYyQ4DOckHH95d8v//ja+XodZdKsiTU2B6Mewqy2kJl1ov3wWfeET51OjyIPyMIRykiJVLJ9anBb2hqJSqpzQ2MVBc77jZOfj9MBnc1gfchLB2kqzluPeD4tS8Jf/RaTRJbCrS77xtiA96VuMlGiUpUnfvOiejv9q5udnfrJUqycYVl0RncIzPeEFfcK5baAqU8iqrxuUmvr12lfqYrRHrXZTqBESrEzdLsV4BKRpijZwp2BX901TKq0UKuIggk++mdE9Itc/Uy0P0P9rOoJ7/95TJS8kHUqr+3YhCok54VXAUNFrV9iKUq0I99YuJHrrwp1ttm1dTMeGYi/upUJ8KL9Settrz7Al24236ZRmPfCZmoMER2Nt4F+q0hJn9OiB35Jq/aMEveucN8teknN63Hpldako/hGa22PW3uT3ff6puK3fYRe/z3E/BursZrv/gNUkYteozwAAA==";let D=[],cur=null;const e=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const b=s=>`<span class="badge ${/pend|ressal|não ident/i.test(s||'')?'warn':''}">${e(s)}</span>`;
+async function load(){let x=atob(P),u=new Uint8Array(x.length);for(let i=0;i<x.length;i++)u[i]=x.charCodeAt(i);let st=new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'));D=JSON.parse(await new Response(st).text());cur=D[0];render();}
+function nav(id){document.querySelectorAll('section').forEach(x=>x.classList.toggle('on',x.id===id));document.querySelectorAll('aside button').forEach(x=>x.classList.toggle('on',x.dataset.s===id));}
+function render(){let clients=new Set(D.map(x=>x.c)),years=new Set(D.map(x=>x.a));dash.innerHTML=`<div class="grid"><div class="card kpi"><b>${D.length}</b><span>Projetos</span></div><div class="card kpi"><b>${clients.size}</b><span>Clientes</span></div><div class="card kpi"><b>${years.size}</b><span>Anos</span></div><div class="card kpi"><b>${D.filter(x=>/conclu/i.test(x.s||'')).length}</b><span>Concluídos</span></div></div>`;
+proj.innerHTML=`<h2>Projetos</h2><div class="card"><input id="q" placeholder="Buscar projeto/cliente"><table><thead><tr><th>Projeto</th><th>Cliente</th><th>Ano</th><th>Áreas</th><th>Status</th></tr></thead><tbody id="tb"></tbody></table></div>`;draw();qualidade();documentos();}
+function draw(){let q=(document.getElementById('q')?.value||'').toLowerCase(),L=D.filter(x=>[x.i,x.c,...x.t,...x.w].join(' ').toLowerCase().includes(q));tb.innerHTML=L.map(x=>`<tr><td class="click" data-i="${e(x.i)}">${e(x.i)}</td><td>${e(x.c)}</td><td>${e(x.a)}</td><td>${x.t.map(b).join(' ')}</td><td>${b(x.s)}</td></tr>`).join('');document.querySelectorAll('[data-i]').forEach(z=>z.onclick=()=>{cur=D.find(x=>x.i===z.dataset.i);qualidade();documentos();nav('qual')});document.getElementById('q').oninput=draw;}
+function qualidade(){if(!cur)return;qual.innerHTML=`<h2>${e(cur.i)}</h2><div class="card"><b>Checklist V6:</b> ${cur.k[0]} de ${cur.k[1]} itens conformes</div><div class="card"><h3>Gates</h3><table><thead><tr><th>Gate</th><th>Status</th></tr></thead><tbody>${cur.g.map(g=>`<tr><td>${e(g[0])}</td><td>${b(g[1])}</td></tr>`).join('')}</tbody></table></div>`}
+function documentos(){if(!cur)return;docs.innerHTML=`<h2>Documentos referenciados — ${e(cur.i)}</h2><div class="card"><p class="small">Referências históricas; arquivos originais indisponíveis.</p>${cur.d.length?'<ul>'+cur.d.map(x=>`<li>${e(x)}</li>`).join('')+'</ul>':'Nenhum documento referenciado.'}</div>`}
+document.querySelectorAll('aside button').forEach(x=>x.onclick=()=>nav(x.dataset.s));load().catch(err=>document.querySelector('main').innerHTML='<div class="card">Erro ao carregar base: '+e(err)+'</div>');
+</script></body></html>
