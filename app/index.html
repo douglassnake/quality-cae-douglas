@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q-SIM — Plataforma de Qualidade CAE</title>
+<style>
+html,body{margin:0;min-height:100%;font-family:Arial,Helvetica,sans-serif;background:#f6f7f9;color:#1e293b}.loading{min-height:100vh;display:grid;place-items:center}.box{max-width:720px;margin:24px;padding:28px;background:#fff;border:1px solid #d8dee8;border-radius:10px}.bar{height:8px;border-radius:999px;background:#e5e7eb;overflow:hidden;margin-top:18px}.bar i{display:block;height:100%;width:45%;background:#0f766e;animation:load 1.2s infinite alternate}@keyframes load{to{width:90%}}.muted{color:#64748b;font-size:13px;line-height:1.5}</style>
+</head>
+<body>
+<div class="loading"><div class="box"><h2>Q-SIM</h2><p>Carregando a base histórica recuperada...</p><p class="muted">Snapshot preservado da V6. A versão V7/V8 original não está disponível nos arquivos recuperados e não é simulada por esta publicação.</p><div class="bar"><i></i></div></div></div>
+<script>
+(async()=>{
+  try{
+    const parts=[];
+    for(let i=0;i<10;i++){
+      const name=`data/v6.gz.b64.part${String(i).padStart(2,'0')}`;
+      const r=await fetch(name,{cache:'no-store'});
+      if(!r.ok) throw new Error(`Falha ao carregar ${name}: ${r.status}`);
+      parts.push((await r.text()).trim());
+    }
+    const b64=parts.join('');
+    const binary=atob(b64);
+    const bytes=new Uint8Array(binary.length);
+    for(let i=0;i<binary.length;i++) bytes[i]=binary.charCodeAt(i);
+    if(!('DecompressionStream' in window)) throw new Error('Navegador sem suporte a DecompressionStream/gzip.');
+    const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+    const html=await new Response(stream).text();
+    document.open();
+    document.write(html);
+    document.close();
+  }catch(err){
+    document.body.innerHTML=`<div class="loading"><div class="box"><h2>Q-SIM</h2><p>Não foi possível abrir o snapshot recuperado.</p><pre style="white-space:pre-wrap">${String(err)}</pre></div></div>`;
+  }
+})();
+</script>
+</body>
+</html>
