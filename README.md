@@ -2,134 +2,102 @@
 
 Repositório oficial da plataforma **Q-SIM**, voltada à gestão da qualidade, rastreabilidade técnica e base de conhecimento de projetos de engenharia e simulação CAE.
 
-## Referência atual
+## Entrada principal do MVP
 
-- **Layout:** manter o padrão consolidado da V6.
-- **Checklist e Gates:** manter a lógica funcional evoluída na V7 e consolidada nas versões posteriores.
-- **Versões futuras:** preservar a identidade visual e evoluir a lógica sem regressão funcional.
+A interface consolidada está em:
 
-## Modelo atual de funcionamento
+```text
+app/final.html
+```
 
-A Q-SIM deve funcionar de forma **autossuficiente a partir deste repositório**.
+Ela reúne:
 
-A plataforma NÃO depende mais de:
+- Dashboard;
+- Projetos;
+- Checklist e Gates históricos;
+- Motor de Similaridade e Reuso de Conhecimento;
+- Busca transversal;
+- Referências documentais;
+- Governança e limitações conhecidas.
+
+`app/index.html` permanece como snapshot/base recuperada da V6 e fonte dos dados compactados. `app/knowledge.html` permanece como módulo isolado de referência do motor de similaridade.
+
+## Referências de produto
+
+- **V6:** referência visual e snapshot recuperado.
+- **V7/V8:** não estão disponíveis como arquivos recuperáveis neste repositório; não são simuladas artificialmente.
+- **MVP consolidado:** `app/final.html`, construído somente sobre dados estruturados disponíveis.
+
+## Modelo autossuficiente
+
+A Q-SIM não depende mais de:
 
 ```text
 W:\Douglas\PLATAFORMA_QUALIDADE
 W:\Douglas\PLATAFORMA_QUALIDADE\Propostas_Relatorio
 ```
 
-Esses caminhos devem ser tratados apenas como referências históricas de origem e nunca como dependências obrigatórias de execução.
+Esses caminhos são apenas referências históricas. Nenhuma funcionalidade atual deve exigir acesso a eles.
 
-## Base consolidada
+## Base consolidada e evidências
 
-Os dados já incorporados à plataforma são a fonte principal para continuidade do projeto, incluindo, quando existentes:
+A fonte de continuidade é a informação já estruturada na recuperação V6. Quando um documento original estiver indisponível:
 
-- projetos históricos;
-- fichas técnicas;
-- checklists;
-- Gates de Qualidade;
-- status históricos;
-- justificativas técnicas;
-- evidências extraídas;
-- nomes de documentos de origem;
-- páginas e seções;
-- trechos documentais já incorporados;
-- níveis de evidência e confiança;
-- lições aprendidas;
-- base histórica e rastreabilidade.
+- preservar nome/referência documental;
+- preservar dados já extraídos;
+- não inventar conteúdo ausente;
+- não transformar ausência documental em não conformidade;
+- não recalcular conformidade sem nova evidência verificável.
 
-A ausência dos documentos originais não deve impedir a navegação, consulta, análise ou evolução da plataforma.
+Novos documentos podem ser incorporados futuramente como entrada opcional.
 
-## Política para evidências históricas
+## Similaridade e conhecimento
 
-Quando o documento original não estiver disponível:
+O motor utiliza somente campos recuperados e funciona em **modo de recomendação**. Ele compara:
 
-- preservar o nome do documento;
-- preservar a página, seção e trecho já extraídos;
-- preservar a justificativa técnica associada;
-- indicar que o documento original está indisponível, quando aplicável;
-- não apagar ou invalidar evidências já consolidadas apenas porque o arquivo-fonte não pode mais ser acessado;
-- não inventar novos dados para preencher lacunas.
+- modalidade/áreas;
+- software;
+- título/objeto;
+- referências documentais;
+- cliente.
 
-## Novos documentos
+O score é explicável e não altera automaticamente Checklist, Gates ou parâmetros técnicos. Metodologia detalhada: `docs/SIMILARITY_ENGINE.md`.
 
-Novos relatórios, propostas ou documentos técnicos poderão ser incorporados futuramente como fontes adicionais.
-
-Eles devem ser tratados como entrada opcional, e não como requisito para funcionamento da plataforma.
-
-Documentos de clientes e arquivos potencialmente confidenciais não devem ser publicados neste repositório público sem autorização explícita.
-
-## Motor de Similaridade e Conhecimento
-
-A primeira evolução sobre a base recuperada está disponível em:
-
-```text
-app/knowledge.html
-```
-
-O módulo trabalha em **modo de recomendação** e utiliza somente os campos estruturados que já existem na recuperação V6. Ele oferece:
-
-- seleção de projeto de referência;
-- Top 5 ou Top 10 projetos históricos relacionados;
-- score de similaridade explicado por dimensão;
-- classificação do nível de similaridade;
-- indicação das diferenças e limitações do score;
-- sinais de Checklist e Gates que merecem revisão documental.
-
-O módulo não cria fatos técnicos ausentes, não presume não conformidade por ausência documental e não altera automaticamente Checklist ou Gates.
-
-A metodologia está documentada em:
-
-```text
-docs/SIMILARITY_ENGINE.md
-```
-
-## Objetivos da plataforma
-
-- consolidar projetos históricos de engenharia;
-- manter ficha técnica rastreável por projeto;
-- controlar Checklists e Gates de Qualidade;
-- vincular evidências a documentos, páginas e revisões quando disponíveis;
-- registrar lições aprendidas;
-- apoiar novos projetos utilizando conhecimento histórico;
-- evoluir o motor de similaridade e reuso de conhecimento conforme novas evidências fiquem disponíveis.
-
-## Estrutura do repositório
+## Estrutura
 
 ```text
 quality-cae-douglas/
-├── app/                 # Aplicação/plataforma atual
-├── data/                # Dados estruturados permitidos para versionamento
-├── docs/                # Documentação técnica
-├── scripts/             # Ferramentas auxiliares
-├── tests/               # Testes
+├── .github/workflows/validate.yml
+├── app/
+│   ├── index.html       # snapshot/base V6 recuperada
+│   ├── knowledge.html   # módulo isolado de similaridade
+│   └── final.html       # interface principal do MVP
+├── docs/
+│   ├── DATA_CONTINUITY.md
+│   ├── SIMILARITY_ENGINE.md
+│   └── PROJECT_COMPLETE.md
+├── scripts/
+├── tests/
+│   └── validate_qsim.py
 ├── README.md
 ├── CHANGELOG.md
 └── .gitignore
 ```
 
-## Fonte oficial de continuidade
+## Validação
 
-A partir desta mudança, a ordem de prioridade é:
+O workflow `Validate Q-SIM` executa `python tests/validate_qsim.py` em pull requests e pushes para `main`.
 
-1. dados consolidados presentes na versão atual da Q-SIM;
-2. evidências estruturadas já incorporadas;
-3. arquivos novos adicionados futuramente;
-4. documentos históricos originais, apenas se voltarem a estar disponíveis.
+A validação verifica, entre outros pontos:
 
-## Versionamento
+- presença da base compactada;
+- presença dos módulos principais;
+- ausência de dependência obrigatória da antiga unidade `W:`;
+- avisos de continuidade documental;
+- caráter não destrutivo das recomendações.
 
-- Não sobrescrever versões históricas de referência sem necessidade.
-- V6 permanece referência visual.
-- Checklist e Gates evoluídos devem permanecer preservados.
-- Toda alteração relevante deve ser registrada em `CHANGELOG.md`.
-- Evitar publicar documentos de clientes, propostas, relatórios e arquivos confidenciais.
+## Estado do projeto
 
-## Desenvolvimento
+O projeto é considerado **MVP concluído** quando o PR final for integrado e o workflow de validação estiver aprovado.
 
-O desenvolvimento deve ocorrer diretamente neste repositório.
-
-O Codex e demais ferramentas de desenvolvimento não devem assumir que existe uma unidade `W:` ou outra pasta externa.
-
-Qualquer importador futuro deve aceitar uma pasta de entrada configurável e opcional.
+O escopo concluído é uma plataforma estática, autossuficiente e auditável sobre a base recuperada. Evoluções futuras — autenticação, banco transacional, ingestão de novos documentos e reanálise semântica — são melhorias pós-MVP e não requisitos para operação da versão atual.
