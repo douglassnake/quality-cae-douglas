@@ -1,0 +1,40 @@
+# Q-SIM
+
+# Dados e documentos técnicos locais
+Propostas_Relatorio/
+**/Propostas_Relatorio/
+*.pdf
+*.doc
+*.docx
+*.xls
+*.xlsx
+
+# Dados temporários / importação
+logs/
+cache/
+*.log
+*.tmp
+*.bak
+
+# Python
+__pycache__/
+*.py[cod]
+.venv/
+venv/
+
+# Node
+node_modules/
+.next/
+dist/
+build/
+
+# Sistema / IDE
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# Segredos e ambientes
+.env
+.env.*
+!.env.example
