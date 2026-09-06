@@ -1,0 +1,61 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q-SIM — Similaridade e Conhecimento</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1e293b;--muted:#64748b;--brand:#164e63;--accent:#0f766e;--line:#d8dee8;--soft:#eef2f7;--warn:#b45309}
+*{box-sizing:border-box}body{margin:0;font:14px Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}header{background:var(--brand);color:#fff;padding:16px 22px;border-bottom:4px solid var(--accent)}header h1{margin:0;font-size:21px}header small{color:#d9fbf6}.wrap{max-width:1280px;margin:auto;padding:18px}.card{background:var(--panel);border:1px solid var(--line);border-radius:8px;padding:14px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:12px}.kpi b{display:block;font-size:27px;color:var(--brand)}select,input{padding:9px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}.toolbar{display:flex;gap:10px;flex-wrap:wrap;align-items:center}.badge{display:inline-block;padding:3px 8px;border-radius:999px;background:#e0f2f1;color:#115e59;font-size:11px;font-weight:bold;margin:1px}.warn{background:#fef3c7;color:#92400e}.muted{color:var(--muted)}table{width:100%;border-collapse:collapse}th,td{padding:9px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--soft)}.score{font-size:20px;font-weight:bold;color:var(--brand)}.reason{margin:3px 0}.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px;border-radius:7px;margin-bottom:12px}.good{color:#0f766e}.bad{color:#b91c1c}.bar{height:8px;background:#e5e7eb;border-radius:999px;overflow:hidden}.bar i{display:block;height:100%;background:var(--accent)}
+</style>
+</head>
+<body>
+<header><h1>Q-SIM — Similaridade e Reuso de Conhecimento</h1><small>Modo de recomendação · dados estruturados recuperados da V6</small></header>
+<div class="wrap">
+<div class="notice">Este módulo não reprocessa relatórios originais e não cria fatos técnicos ausentes. O score usa apenas os campos estruturados disponíveis no snapshot recuperado.</div>
+<div class="card toolbar"><label>Projeto de referência <select id="project"></select></label><label>Top <select id="top"><option>5</option><option>10</option></select></label><button id="run">Analisar similaridade</button><span id="status" class="muted"></span></div>
+<div id="summary" class="grid"></div>
+<div class="card"><h2>Projetos históricos relacionados</h2><div id="results"></div></div>
+<div class="card"><h2>Sinais para revisão de qualidade</h2><div id="signals"></div></div>
+</div>
+<script>
+const esc=s=>String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const set=a=>new Set((a||[]).map(x=>String(x).toLowerCase().trim()).filter(Boolean));
+const tok=s=>set(String(s||'').toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'').split(/[^a-z0-9]+/).filter(x=>x.length>2));
+const jac=(A,B)=>{if(!A.size&&!B.size)return null;let i=0;A.forEach(x=>B.has(x)&&i++);let u=new Set([...A,...B]).size;return u?i/u:null};
+const pct=x=>Math.round(x*100);
+function similarity(a,b){
+  const dims=[];
+  const push=(name,w,v,why)=>{if(v!==null&&!Number.isNaN(v))dims.push({name,w,v,why})};
+  const tags=jac(set(a.t),set(b.t));push('Modalidade/áreas',40,tags,tags!==null?`${[...set(a.t)].filter(x=>set(b.t).has(x)).join(', ')||'sem interseção'}`:'indisponível');
+  const sw=jac(set(a.w),set(b.w));push('Software',25,sw,sw!==null?`${[...set(a.w)].filter(x=>set(b.w).has(x)).join(', ')||'sem interseção'}`:'indisponível');
+  const title=jac(tok(a.i),tok(b.i));push('Título/objeto',20,title,title!==null?'similaridade lexical do título':'indisponível');
+  const docs=jac(tok((a.d||[]).join(' ')),tok((b.d||[]).join(' ')));push('Referências documentais',10,docs,docs!==null?'termos compartilhados em nomes de documentos':'indisponível');
+  push('Mesmo cliente',5,a.c&&b.c?(a.c.toLowerCase()===b.c.toLowerCase()?1:0):null,a.c===b.c?'mesmo cliente':'cliente diferente');
+  const den=dims.reduce((s,d)=>s+d.w,0),score=den?dims.reduce((s,d)=>s+d.w*d.v,0)/den:0;
+  return {score,dims};
+}
+async function loadData(){
+  const r=await fetch('index.html',{cache:'no-store'});if(!r.ok)throw new Error('Não foi possível carregar app/index.html');
+  const html=await r.text();const m=html.match(/const P="([A-Za-z0-9+/=]+)"/);if(!m)throw new Error('Base compactada P não localizada no snapshot atual.');
+  const bin=atob(m[1]);const u=new Uint8Array(bin.length);for(let i=0;i<bin.length;i++)u[i]=bin.charCodeAt(i);
+  if(!('DecompressionStream' in window))throw new Error('Navegador sem suporte a gzip/DecompressionStream.');
+  const st=new Blob([u]).stream().pipeThrough(new DecompressionStream('gzip'));return JSON.parse(await new Response(st).text());
+}
+let D=[];
+function level(s){let p=pct(s);return p>=90?'Muito semelhante':p>=75?'Semelhante':p>=55?'Parcialmente semelhante':p>=35?'Baixa similaridade':'Pouco relevante'}
+function render(){
+ const ref=D.find(x=>x.i===project.value)||D[0];const n=Number(top.value)||5;
+ const rows=D.filter(x=>x!==ref).map(x=>({x,...similarity(ref,x)})).sort((a,b)=>b.score-a.score).slice(0,n);
+ summary.innerHTML=`<div class="card kpi"><b>${esc(ref.i)}</b><span>Projeto de referência</span></div><div class="card kpi"><b>${rows.length}</b><span>Referências exibidas</span></div><div class="card kpi"><b>${rows.length?pct(rows[0].score)+'%':'—'}</b><span>Maior similaridade</span></div>`;
+ results.innerHTML=`<table><thead><tr><th>Projeto</th><th>Score</th><th>Classificação</th><th>Por que</th><th>Diferenças / limites</th></tr></thead><tbody>${rows.map(r=>{
+  const good=r.dims.filter(d=>d.v>=.5).map(d=>`<div class="reason good">+ ${esc(d.name)}: ${esc(d.why)}</div>`).join('')||'<span class="muted">Nenhum critério forte disponível.</span>';
+  const low=r.dims.filter(d=>d.v<.5).map(d=>`<div class="reason muted">− ${esc(d.name)}: ${esc(d.why)}</div>`).join('');
+  return `<tr><td><b>${esc(r.x.i)}</b><br><span class="muted">${esc(r.x.c)} · ${esc(r.x.a)}</span></td><td><span class="score">${pct(r.score)}%</span><div class="bar"><i style="width:${pct(r.score)}%"></i></div></td><td><span class="badge">${level(r.score)}</span></td><td>${good}</td><td>${low}</td></tr>`}).join('')}</tbody></table>`;
+ const gateSignals=(ref.g||[]).filter(g=>/pend|ressal|não|reprov/i.test(g[1]||''));const checklist=(ref.k&&ref.k.length>1)?`${ref.k[0]} de ${ref.k[1]} conformes`:'não disponível';
+ signals.innerHTML=`<p><b>Checklist recuperado:</b> ${esc(checklist)}</p>${gateSignals.length?`<p><b>Gates que merecem revisão documental:</b></p><ul>${gateSignals.map(g=>`<li>${esc(g[0])}: ${esc(g[1])}</li>`).join('')}</ul>`:'<p class="muted">Nenhum sinal de Gate pendente/ressalva foi identificado nos campos recuperados.</p>'}<p class="muted">Esses sinais não equivalem a não conformidade técnica; indicam apenas onde a evidência histórica disponível merece revisão.</p>`;
+}
+loadData().then(d=>{D=d;project.innerHTML=D.map(x=>`<option value="${esc(x.i)}">${esc(x.i)} — ${esc(x.c)}</option>`).join('');status.textContent=`${D.length} projetos carregados`;render()}).catch(e=>status.textContent='Erro: '+e.message);
+run.onclick=render;project.onchange=render;top.onchange=render;
+</script>
+</body></html>
