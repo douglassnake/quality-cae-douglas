@@ -4,13 +4,13 @@
 <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
 <title>Q-SIM — Qualidade e Ferramentas CAE/CFD</title>
 <style>
-html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:#0f2f3b}body{display:grid;grid-template-rows:auto 1fr;min-height:100dvh}.bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#0f2f3b;border-bottom:2px solid #0f766e;position:relative;z-index:50}.brand{color:#fff;font-weight:bold;margin-right:auto;white-space:nowrap}.bar button{border:1px solid #44717a;background:transparent;color:#e6f6f4;border-radius:6px;padding:7px 11px;cursor:pointer;white-space:nowrap}.bar button.on{background:#0f766e;border-color:#0f766e;color:#fff}.tools-btn{font-weight:bold}iframe{width:100%;height:100%;border:0;background:#f6f7f9;display:block}
-@media(max-width:600px){.bar{display:grid;grid-template-columns:auto 1fr 1.55fr;gap:6px;padding:6px 8px}.brand{font-size:13px}.bar button{font-size:12px;padding:8px 5px;min-width:0;white-space:normal;line-height:1.15}.tools-btn{font-weight:bold}}
+html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:#0f2f3b}body{display:grid;grid-template-rows:auto 1fr;min-height:100dvh}.bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#0f2f3b;border-bottom:2px solid #0f766e;position:relative;z-index:50}.brand{color:#fff;font-weight:bold;margin-right:auto;white-space:nowrap}.bar button{border:1px solid #44717a;background:transparent;color:#e6f6f4;border-radius:6px;padding:7px 11px;cursor:pointer;white-space:nowrap}.bar button.on{background:#0f766e;border-color:#0f766e;color:#fff}.tools-btn,.materials-btn{font-weight:bold}iframe{width:100%;height:100%;border:0;background:#f6f7f9;display:block}
+@media(max-width:680px){.bar{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;padding:6px 8px}.brand{grid-column:1/-1;font-size:13px;margin:0}.bar button{font-size:11px;padding:8px 4px;min-width:0;white-space:normal;line-height:1.15}}
 </style>
 </head>
 <body>
-<div class="bar"><span class="brand">Q-SIM</span><button class="on" data-src="app/final.html?v=20260907-3">Plataforma</button><button class="tools-btn" data-src="app/tools.html?v=20260907-3">Ferramentas Técnicas CAE/CFD</button></div>
-<iframe id="view" src="app/final.html?v=20260907-3" title="Q-SIM"></iframe>
+<div class="bar"><span class="brand">Q-SIM</span><button class="on" data-src="app/final.html?v=20260907-4">Plataforma</button><button class="tools-btn" data-src="app/tools.html?v=20260907-4">Ferramentas CAE/CFD</button><button class="materials-btn" data-src="app/materials.html?v=20260907-4">Propriedades de Materiais</button></div>
+<iframe id="view" src="app/final.html?v=20260907-4" title="Q-SIM"></iframe>
 <script>
 const view=document.getElementById('view');
 function applyMobileOverrides(){
@@ -20,7 +20,7 @@ function applyMobileOverrides(){
     const link=doc.createElement('link');
     link.id='qsim-mobile-overrides';
     link.rel='stylesheet';
-    link.href='mobile-overrides.css?v=20260907-3';
+    link.href='mobile-overrides.css?v=20260907-4';
     doc.head.appendChild(link);
   }catch(_e){}
 }
