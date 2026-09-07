@@ -70,7 +70,7 @@ def test_technical_tools_present():
     required = [
         "function calcFlow", "function calcYplus", "function calcCFL",
         "function calcCoef", "function calcGCI", "function calcThermal",
-        "function calcUnits", "Grid Convergence Index", "DecompressionStream" if False else "CFL",
+        "function calcUnits", "Grid Convergence Index", "CFL",
     ]
     missing = [x for x in required if x not in html]
     assert not missing, f"ferramentas técnicas ausentes: {missing}"
@@ -79,15 +79,29 @@ def test_technical_tools_present():
     assert "Nenhum dado digitado é enviado para servidor" in html
 
 
+def test_material_properties_module_present():
+    html = read("materials.html")
+    required = [
+        "Módulo de Young", "Módulo de cisalhamento", "Módulo volumétrico",
+        "Coeficiente de expansão térmica", "Condutividade térmica",
+        "Calor específico", "Difusividade térmica", "Tenacidade à fratura",
+        "Resistividade elétrica", "Condutividade elétrica",
+    ]
+    missing = [x for x in required if x not in html]
+    assert not missing, f"propriedades de materiais ausentes: {missing}"
+
+
 def test_public_shell_integrates_tools():
     shell = (ROOT / "index.html").read_text(encoding="utf-8")
     assert "app/final.html" in shell
     assert "app/tools.html" in shell
-    assert "Ferramentas Técnicas" in shell
+    assert "app/materials.html" in shell
+    assert ("Ferramentas Técnicas" in shell) or ("Ferramentas CAE/CFD" in shell)
+    assert "Propriedades de Materiais" in shell
 
 
 def test_no_old_local_dependency():
-    for name in ("final.html", "knowledge.html", "tools.html"):
+    for name in ("final.html", "knowledge.html", "tools.html", "materials.html"):
         html = read(name)
         assert "W:\\Douglas\\PLATAFORMA_QUALIDADE" not in html
         assert "Propostas_Relatorio" not in html
