@@ -100,17 +100,32 @@ def test_advanced_tools_present():
     assert not missing, f"ferramentas avançadas ausentes: {missing}"
 
 
+def test_bernoulli_module_present():
+    html = read("bernoulli.html")
+    required = [
+        "Bernoulli ideal entre dois pontos", "Bernoulli estendido",
+        "Pressão de estagnação", "Venturi", "function calcIdeal",
+        "function calcExtended", "function calcStag", "function calcVenturi",
+        "P₁/(ρg)", "Hₚ", "Q = Cd",
+    ]
+    missing = [x for x in required if x not in html]
+    assert not missing, f"módulo Bernoulli incompleto: {missing}"
+    assert "escoamento permanente" in html
+    assert "compressibilidade" in html
+
+
 def test_public_shell_integrates_tools():
     shell = (ROOT / "index.html").read_text(encoding="utf-8")
-    for path in ("app/final.html", "app/tools.html", "app/materials.html", "app/advanced.html"):
+    for path in ("app/final.html", "app/tools.html", "app/materials.html", "app/advanced.html", "app/bernoulli.html"):
         assert path in shell, f"módulo não integrado ao shell: {path}"
     assert ("Ferramentas Técnicas" in shell) or ("Ferramentas CAE/CFD" in shell)
     assert "Propriedades de Materiais" in shell
     assert "Ferramentas Avançadas" in shell
+    assert "Bernoulli CFD" in shell
 
 
 def test_no_old_local_dependency():
-    for name in ("final.html", "knowledge.html", "tools.html", "materials.html", "advanced.html"):
+    for name in ("final.html", "knowledge.html", "tools.html", "materials.html", "advanced.html", "bernoulli.html"):
         html = read(name)
         assert "W:\\Douglas\\PLATAFORMA_QUALIDADE" not in html
         assert "Propostas_Relatorio" not in html
