@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Q-SIM — Equações de Bernoulli CFD</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1e293b;--muted:#64748b;--brand:#164e63;--accent:#0f766e;--line:#d8dee8;--soft:#eef2f7;--warn:#9a3412}
+*{box-sizing:border-box}body{margin:0;font:14px Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}header{background:var(--brand);color:#fff;padding:16px 22px;border-bottom:4px solid var(--accent)}header h1{margin:0;font-size:22px}header small{color:#d9fbf6}.wrap{max-width:1300px;margin:auto;padding:18px}.notice{background:#fff7ed;border:1px solid #fed7aa;color:var(--warn);padding:11px;border-radius:8px;margin-bottom:14px}.tabs{display:grid;grid-template-columns:repeat(4,minmax(150px,1fr));gap:8px;margin-bottom:14px}.tabs button{padding:10px;border:1px solid var(--line);background:#fff;border-radius:7px;cursor:pointer;color:#0369a1}.tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}.tool{display:none}.tool.on{display:block}.card{background:#fff;border:1px solid var(--line);border-radius:9px;padding:15px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:10px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.field input,.field select{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}.actions{margin-top:12px}.calc{border:0;background:var(--accent);color:#fff;font-weight:bold;padding:10px 14px;border-radius:6px;cursor:pointer}.result{margin-top:12px;padding:12px;background:#eef6f5;border:1px solid #cfe7e3;border-radius:8px;line-height:1.55}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--soft);padding:9px;border-radius:6px;overflow:auto}.muted{color:var(--muted)}.warn{color:#b45309;font-weight:bold}.toplink{display:inline-block;color:#d9fbf6;text-decoration:none;font-weight:bold;margin-top:8px}
+@media(max-width:720px){.wrap{padding:12px}.tabs{grid-template-columns:1fr 1fr}header{padding:14px 18px}header h1{font-size:20px}}
+</style>
+</head>
+<body>
+<header><h1>Q-SIM — Equações de Bernoulli CFD</h1><small>Energia mecânica em escoamentos · pré e pós-processamento</small><br><a class="toplink" href="../index.html">← Voltar para a Q-SIM</a></header>
+<div class="wrap">
+<div class="notice"><b>Hipóteses:</b> a forma ideal de Bernoulli pressupõe escoamento permanente, incompressível, sem dissipação viscosa relevante e aplicação ao longo de uma linha de corrente. Para bombas, turbinas e perdas de carga, use a forma estendida. Para Mach elevado, choques ou forte compressibilidade, use relações de escoamento compressível.</div>
+<div class="tabs"><button class="on" data-t="ideal">Entre 2 pontos</button><button data-t="extended">Bernoulli estendido</button><button data-t="stag">Estagnação</button><button data-t="venturi">Venturi</button></div>
+
+<section id="ideal" class="tool on"><div class="card"><h2>Bernoulli ideal entre dois pontos</h2>
+<div class="grid">
+<div class="field"><label>Densidade ρ [kg/m³]</label><input id="bi_rho" type="number" step="any" value="998.2"></div>
+<div class="field"><label>Gravidade g [m/s²]</label><input id="bi_g" type="number" step="any" value="9.80665"></div>
+<div class="field"><label>P1 [Pa]</label><input id="bi_p1" type="number" step="any" value="101325"></div>
+<div class="field"><label>V1 [m/s]</label><input id="bi_v1" type="number" step="any" value="2"></div>
+<div class="field"><label>z1 [m]</label><input id="bi_z1" type="number" step="any" value="0"></div>
+<div class="field"><label>α1</label><input id="bi_a1" type="number" step="any" value="1"></div>
+<div class="field"><label>V2 [m/s]</label><input id="bi_v2" type="number" step="any" value="4"></div>
+<div class="field"><label>z2 [m]</label><input id="bi_z2" type="number" step="any" value="0"></div>
+<div class="field"><label>α2</label><input id="bi_a2" type="number" step="any" value="1"></div>
+</div><div class="actions"><button class="calc" onclick="calcIdeal()">Calcular P2</button></div><div id="bi_out" class="result"></div>
+<p class="formula">P₁/(ρg) + α₁V₁²/(2g) + z₁ = P₂/(ρg) + α₂V₂²/(2g) + z₂</p><p class="muted">α é o fator de correção de energia cinética. Para perfil aproximadamente uniforme, α≈1.</p></div></section>
+
+<section id="extended" class="tool"><div class="card"><h2>Bernoulli estendido</h2>
+<div class="grid">
+<div class="field"><label>Densidade ρ [kg/m³]</label><input id="be_rho" type="number" step="any" value="998.2"></div>
+<div class="field"><label>Gravidade g [m/s²]</label><input id="be_g" type="number" step="any" value="9.80665"></div>
+<div class="field"><label>P1 [Pa]</label><input id="be_p1" type="number" step="any" value="101325"></div>
+<div class="field"><label>V1 [m/s]</label><input id="be_v1" type="number" step="any" value="2"></div>
+<div class="field"><label>z1 [m]</label><input id="be_z1" type="number" step="any" value="0"></div>
+<div class="field"><label>V2 [m/s]</label><input id="be_v2" type="number" step="any" value="2"></div>
+<div class="field"><label>z2 [m]</label><input id="be_z2" type="number" step="any" value="5"></div>
+<div class="field"><label>Carga adicionada por bomba Hp [m]</label><input id="be_hp" type="number" step="any" value="10"></div>
+<div class="field"><label>Carga retirada por turbina Ht [m]</label><input id="be_ht" type="number" step="any" value="0"></div>
+<div class="field"><label>Perda de carga hL [m]</label><input id="be_hl" type="number" step="any" value="2"></div>
+</div><div class="actions"><button class="calc" onclick="calcExtended()">Calcular P2</button></div><div id="be_out" class="result"></div>
+<p class="formula">P₁/(ρg)+V₁²/(2g)+z₁+Hₚ−Hₜ−hL = P₂/(ρg)+V₂²/(2g)+z₂</p></div></section>
+
+<section id="stag" class="tool"><div class="card"><h2>Pressão de estagnação — forma incompressível</h2>
+<div class="grid">
+<div class="field"><label>Pressão estática P [Pa]</label><input id="bs_p" type="number" step="any" value="101325"></div>
+<div class="field"><label>Densidade ρ [kg/m³]</label><input id="bs_rho" type="number" step="any" value="1.225"></div>
+<div class="field"><label>Velocidade V [m/s]</label><input id="bs_v" type="number" step="any" value="25"></div>
+</div><div class="actions"><button class="calc" onclick="calcStag()">Calcular</button></div><div id="bs_out" class="result"></div>
+<p class="formula">q = ½ρV² · P₀ = P + q</p><p class="muted">Adequado quando efeitos de compressibilidade são pequenos. Para escoamento compressível, a relação de pressão total deve considerar Mach e γ.</p></div></section>
+
+<section id="venturi" class="tool"><div class="card"><h2>Venturi — vazão por diferença de pressão</h2>
+<div class="grid">
+<div class="field"><label>Densidade ρ [kg/m³]</label><input id="bv_rho" type="number" step="any" value="998.2"></div>
+<div class="field"><label>Diâmetro D1 [m]</label><input id="bv_d1" type="number" step="any" value="0.10"></div>
+<div class="field"><label>Diâmetro D2 [m]</label><input id="bv_d2" type="number" step="any" value="0.05"></div>
+<div class="field"><label>P1 [Pa]</label><input id="bv_p1" type="number" step="any" value="150000"></div>
+<div class="field"><label>P2 [Pa]</label><input id="bv_p2" type="number" step="any" value="120000"></div>
+<div class="field"><label>Coeficiente de descarga Cd</label><input id="bv_cd" type="number" step="any" value="0.98"></div>
+</div><div class="actions"><button class="calc" onclick="calcVenturi()">Calcular vazão</button></div><div id="bv_out" class="result"></div>
+<p class="formula">Q = Cd·A₂·√[2(P₁−P₂)/(ρ·(1−(A₂/A₁)²))]</p><p class="muted">Forma simplificada para mesma cota e fluido incompressível. Em medidores reais, Cd deve ser compatível com a geometria e faixa de Reynolds.</p></div></section>
+</div>
+<script>
+const n=id=>Number(document.getElementById(id).value);const fmt=(x,d=7)=>Number.isFinite(x)?Number(x).toLocaleString('pt-BR',{maximumSignificantDigits:d}):'—';
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tool').forEach(x=>x.classList.toggle('on',x.id===b.dataset.t))});
+function calcIdeal(){const rho=n('bi_rho'),g=n('bi_g'),p1=n('bi_p1'),v1=n('bi_v1'),z1=n('bi_z1'),a1=n('bi_a1'),v2=n('bi_v2'),z2=n('bi_z2'),a2=n('bi_a2');if(!(rho>0&&g>0)){bi_out.innerHTML='<span class="warn">ρ e g devem ser positivos.</span>';return}const H1=p1/(rho*g)+a1*v1*v1/(2*g)+z1;const kinetic2=a2*v2*v2/(2*g);const p2=rho*g*(H1-kinetic2-z2);const q1=.5*rho*v1*v1,q2=.5*rho*v2*v2;bi_out.innerHTML=`Carga total no ponto 1 = <b>${fmt(H1)} m</b><br>P2 = <b>${fmt(p2)} Pa</b> (${fmt(p2/1000)} kPa)<br>q1 = ${fmt(q1)} Pa · q2 = ${fmt(q2)} Pa`;}
+function calcExtended(){const rho=n('be_rho'),g=n('be_g'),p1=n('be_p1'),v1=n('be_v1'),z1=n('be_z1'),v2=n('be_v2'),z2=n('be_z2'),hp=n('be_hp'),ht=n('be_ht'),hl=n('be_hl');if(!(rho>0&&g>0)){be_out.innerHTML='<span class="warn">ρ e g devem ser positivos.</span>';return}const H1=p1/(rho*g)+v1*v1/(2*g)+z1;const H2=H1+hp-ht-hl;const p2=rho*g*(H2-v2*v2/(2*g)-z2);const dP=p2-p1;be_out.innerHTML=`Carga no ponto 1 = ${fmt(H1)} m<br>Carga disponível no ponto 2 = <b>${fmt(H2)} m</b><br>P2 = <b>${fmt(p2)} Pa</b> (${fmt(p2/1000)} kPa)<br>ΔP = ${fmt(dP)} Pa`;}
+function calcStag(){const p=n('bs_p'),rho=n('bs_rho'),v=n('bs_v');if(!(rho>0)){bs_out.innerHTML='<span class="warn">ρ deve ser positivo.</span>';return}const q=.5*rho*v*v,p0=p+q;bs_out.innerHTML=`Pressão dinâmica q = <b>${fmt(q)} Pa</b><br>Pressão de estagnação P₀ = <b>${fmt(p0)} Pa</b> (${fmt(p0/1000)} kPa)`;}
+function calcVenturi(){const rho=n('bv_rho'),d1=n('bv_d1'),d2=n('bv_d2'),p1=n('bv_p1'),p2=n('bv_p2'),cd=n('bv_cd');if(!(rho>0&&d1>0&&d2>0&&d2<d1&&cd>0)){bv_out.innerHTML='<span class="warn">Use ρ>0, Cd>0 e D2 menor que D1.</span>';return}const dp=p1-p2;if(!(dp>0)){bv_out.innerHTML='<span class="warn">P1 deve ser maior que P2 para esta forma da equação.</span>';return}const A1=Math.PI*d1*d1/4,A2=Math.PI*d2*d2/4,beta=d2/d1;const Q=cd*A2*Math.sqrt(2*dp/(rho*(1-Math.pow(A2/A1,2))));const v1=Q/A1,v2=Q/A2;bv_out.innerHTML=`β = ${fmt(beta)}<br>Q = <b>${fmt(Q)} m³/s</b> (${fmt(Q*3600)} m³/h)<br>V1 = ${fmt(v1)} m/s · V2 = ${fmt(v2)} m/s`;}
+calcIdeal();calcExtended();calcStag();calcVenturi();
+</script>
+</body></html>
