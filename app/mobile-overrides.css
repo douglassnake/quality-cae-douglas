@@ -1,0 +1,55 @@
+/* Q-SIM mobile overrides — loaded by the public shell */
+@media (max-width: 900px) {
+  header { padding: 12px 14px !important; }
+  header h1 { font-size: 20px !important; line-height: 1.2 !important; }
+  header small { font-size: 12px !important; line-height: 1.35 !important; display: block; margin-top: 4px; }
+
+  .layout { display: block !important; min-height: auto !important; }
+  aside {
+    display: grid !important;
+    grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+    gap: 6px !important;
+    overflow: visible !important;
+    padding: 8px !important;
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 30 !important;
+    border-bottom: 1px solid #1d5966;
+  }
+  aside button {
+    width: 100% !important;
+    min-width: 0 !important;
+    white-space: normal !important;
+    text-align: center !important;
+    padding: 8px 5px !important;
+    margin: 0 !important;
+    font-size: 12px !important;
+    line-height: 1.2 !important;
+  }
+
+  main { padding: 12px !important; }
+  .notice { font-size: 13px !important; line-height: 1.4 !important; padding: 10px !important; }
+  .grid { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; gap: 8px !important; }
+  .card { padding: 12px !important; overflow-x: auto; }
+  .kpi b { font-size: 25px !important; }
+  .split { grid-template-columns: 1fr !important; gap: 8px !important; }
+  .toolbar { align-items: stretch !important; }
+  .toolbar input, .toolbar select, .toolbar button { min-width: 0 !important; max-width: 100% !important; }
+  table { min-width: 620px; }
+}
+
+@media (max-width: 520px) {
+  aside { grid-template-columns: repeat(3, minmax(0, 1fr)) !important; }
+  header h1 { font-size: 19px !important; }
+  main { padding: 10px !important; }
+  .grid { gap: 7px !important; }
+  .card { border-radius: 7px !important; }
+  .kpi b { font-size: 24px !important; }
+  .toolbar { display: grid !important; grid-template-columns: 1fr !important; }
+  .toolbar input, .toolbar select, .toolbar button { width: 100% !important; }
+}
+
+@media (max-width: 360px) {
+  aside { grid-template-columns: repeat(2, minmax(0, 1fr)) !important; }
+  .grid { grid-template-columns: 1fr !important; }
+}
