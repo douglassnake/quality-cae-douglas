@@ -114,18 +114,42 @@ def test_bernoulli_module_present():
     assert "compressibilidade" in html
 
 
+def test_complete_cae_suite_present():
+    html = read("suite-cae.html")
+    required = [
+        "Turbulence Inlet Calculator", "Moody / Colebrook", "Escoamento compressível",
+        "Resistência térmica + Biot + Fourier", "FEA — von Mises",
+        "Explicit Dynamics — stable time step", "Rotor / hélice / ventilador",
+        "Simulation Sanity Check", "function calcTurb", "function calcMoody",
+        "function calcCompressible", "function calcThermalR", "function calcFEA",
+        "function calcExplicit", "function calcRotor", "function runSanity",
+    ]
+    missing = [x for x in required if x not in html]
+    assert not missing, f"Suite CAE incompleta: {missing}"
+    assert "Colebrook-White" in html
+    assert "Choque normal" in html
+    assert "não altera Checklist/Gates" in html
+
+
 def test_public_shell_integrates_tools():
     shell = (ROOT / "index.html").read_text(encoding="utf-8")
-    for path in ("app/final.html", "app/tools.html", "app/materials.html", "app/advanced.html", "app/bernoulli.html"):
+    for path in (
+        "app/final.html", "app/tools.html", "app/materials.html",
+        "app/advanced.html", "app/bernoulli.html", "app/suite-cae.html",
+    ):
         assert path in shell, f"módulo não integrado ao shell: {path}"
     assert ("Ferramentas Técnicas" in shell) or ("Ferramentas CAE/CFD" in shell)
     assert "Propriedades de Materiais" in shell
     assert "Ferramentas Avançadas" in shell
     assert "Bernoulli CFD" in shell
+    assert "Suite CAE — 8 Ferramentas" in shell
 
 
 def test_no_old_local_dependency():
-    for name in ("final.html", "knowledge.html", "tools.html", "materials.html", "advanced.html", "bernoulli.html"):
+    for name in (
+        "final.html", "knowledge.html", "tools.html", "materials.html",
+        "advanced.html", "bernoulli.html", "suite-cae.html",
+    ):
         html = read(name)
         assert "W:\\Douglas\\PLATAFORMA_QUALIDADE" not in html
         assert "Propostas_Relatorio" not in html
