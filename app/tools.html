@@ -1,0 +1,91 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Q-SIM — Ferramentas Técnicas CAE/CFD</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1e293b;--muted:#64748b;--brand:#164e63;--accent:#0f766e;--line:#d8dee8;--soft:#eef2f7;--warn:#b45309}
+*{box-sizing:border-box}body{margin:0;font:14px Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}header{background:var(--brand);color:#fff;padding:16px 22px;border-bottom:4px solid var(--accent)}header h1{margin:0;font-size:21px}header small{color:#d9fbf6}.wrap{max-width:1300px;margin:auto;padding:18px}.top{display:flex;justify-content:space-between;gap:12px;align-items:center;flex-wrap:wrap}.top a{color:#d9fbf6;text-decoration:none;font-weight:bold}.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px;border-radius:8px;margin-bottom:14px}.tabs{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:14px}.tabs button{padding:9px 11px;border:1px solid var(--line);background:#fff;border-radius:7px;cursor:pointer}.tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}.tool{display:none}.tool.on{display:block}.card{background:#fff;border:1px solid var(--line);border-radius:9px;padding:14px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.field input,.field select{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}.actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}button.calc{padding:9px 13px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-weight:bold;cursor:pointer}.result{margin-top:12px;padding:12px;background:#eef6f5;border:1px solid #cfe7e3;border-radius:8px}.result b{color:var(--brand)}.muted{color:var(--muted)}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--soft);padding:8px;border-radius:6px;overflow:auto}.warn{color:var(--warn);font-weight:bold}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left}th{background:var(--soft)}@media(max-width:720px){.wrap{padding:12px}}
+</style>
+</head>
+<body>
+<header><div class="top"><div><h1>Q-SIM — Ferramentas Técnicas CAE/CFD</h1><small>Calculadoras locais para pré e pós-processamento</small></div><a href="final.html">← Voltar para a plataforma</a></div></header>
+<div class="wrap">
+<div class="notice">Ferramentas de apoio à engenharia. Os resultados dependem das hipóteses e dados de entrada e não substituem validação física, numérica ou normativa. Nenhum dado digitado é enviado para servidor.</div>
+<div class="tabs">
+<button class="on" data-t="flow">Re / Mach / q</button><button data-t="yplus">y+ / 1ª camada</button><button data-t="cfl">CFL / Δt / rotação</button><button data-t="coef">Cd / Cl</button><button data-t="gci">GCI de malha</button><button data-t="thermal">Convecção térmica</button><button data-t="units">Conversor</button>
+</div>
+
+<section id="flow" class="tool on"><div class="card"><h2>Escoamento rápido</h2><div class="grid">
+<div class="field"><label>Densidade ρ [kg/m³]</label><input id="f_rho" type="number" step="any" value="1.225"></div>
+<div class="field"><label>Viscosidade dinâmica μ [Pa·s]</label><input id="f_mu" type="number" step="any" value="0.00001789"></div>
+<div class="field"><label>Velocidade U [m/s]</label><input id="f_u" type="number" step="any" value="25"></div>
+<div class="field"><label>Comprimento característico L [m]</label><input id="f_l" type="number" step="any" value="1"></div>
+<div class="field"><label>Velocidade do som a [m/s]</label><input id="f_a" type="number" step="any" value="343"></div>
+</div><div class="actions"><button class="calc" onclick="calcFlow()">Calcular</button></div><div id="f_out" class="result"></div>
+<p class="formula">Re = ρUL/μ · Mach = U/a · q = ½ρU²</p><p class="muted">A classificação laminar/transição/turbulento depende da geometria e do fenômeno; por isso a ferramenta não aplica um limite universal de Reynolds.</p></div></section>
+
+<section id="yplus" class="tool"><div class="card"><h2>Estimativa de y+ e primeira camada</h2><div class="grid">
+<div class="field"><label>ρ [kg/m³]</label><input id="y_rho" type="number" step="any" value="1.225"></div>
+<div class="field"><label>μ [Pa·s]</label><input id="y_mu" type="number" step="any" value="0.00001789"></div>
+<div class="field"><label>U [m/s]</label><input id="y_u" type="number" step="any" value="25"></div>
+<div class="field"><label>L [m]</label><input id="y_l" type="number" step="any" value="1"></div>
+<div class="field"><label>y+ alvo</label><input id="y_target" type="number" step="any" value="1"></div>
+<div class="field"><label>Correlação Cf</label><select id="y_corr"><option value="one7">Cf = 0,026 Re^(-1/7)</option><option value="one5">Cf = 0,0592 Re^(-1/5)</option></select></div>
+</div><div class="actions"><button class="calc" onclick="calcYplus()">Calcular</button></div><div id="y_out" class="result"></div>
+<p class="formula">uτ = U√(Cf/2) · y = y+·μ/(ρuτ) · espessura inicial aproximada ≈ 2y</p><p class="muted">Estimativa baseada em correlação de placa plana turbulenta. O valor final de y+ deve ser verificado na solução CFD; separação, gradiente de pressão, rugosidade e rotação podem alterar o atrito de parede.</p></div></section>
+
+<section id="cfl" class="tool"><div class="card"><h2>CFL, passo de tempo e resolução angular</h2><div class="grid">
+<div class="field"><label>Velocidade característica U [m/s]</label><input id="c_u" type="number" step="any" value="25"></div>
+<div class="field"><label>Tamanho local Δx [m]</label><input id="c_dx" type="number" step="any" value="0.005"></div>
+<div class="field"><label>CFL alvo</label><input id="c_target" type="number" step="any" value="1"></div>
+<div class="field"><label>Δt atual [s] (opcional)</label><input id="c_dt" type="number" step="any" value="0.0002"></div>
+<div class="field"><label>Rotação [rpm] (opcional)</label><input id="c_rpm" type="number" step="any" value="3000"></div>
+<div class="field"><label>Graus por passo [°] (opcional)</label><input id="c_deg" type="number" step="any" value="1"></div>
+</div><div class="actions"><button class="calc" onclick="calcCFL()">Calcular</button></div><div id="c_out" class="result"></div><p class="formula">CFL = UΔt/Δx · Δt(CFL) = CFL·Δx/U · Δt(rotação) = Δθ/(6·rpm)</p></div></section>
+
+<section id="coef" class="tool"><div class="card"><h2>Coeficientes aerodinâmicos/hidrodinâmicos</h2><div class="grid">
+<div class="field"><label>ρ [kg/m³]</label><input id="d_rho" type="number" step="any" value="1.225"></div>
+<div class="field"><label>U [m/s]</label><input id="d_u" type="number" step="any" value="25"></div>
+<div class="field"><label>Área de referência A [m²]</label><input id="d_a" type="number" step="any" value="1"></div>
+<div class="field"><label>Força de arrasto Fd [N]</label><input id="d_fd" type="number" step="any" value="100"></div>
+<div class="field"><label>Força de sustentação Fl [N]</label><input id="d_fl" type="number" step="any" value="0"></div>
+<div class="field"><label>Coeficiente conhecido (para força inversa)</label><input id="d_c" type="number" step="any" value="0.3"></div>
+</div><div class="actions"><button class="calc" onclick="calcCoef()">Calcular</button></div><div id="d_out" class="result"></div><p class="formula">C = F/(½ρU²A) · F = C(½ρU²A)</p></div></section>
+
+<section id="gci" class="tool"><div class="card"><h2>GCI — Grid Convergence Index (3 malhas)</h2><p class="muted">Informe h1 &lt; h2 &lt; h3, sendo 1 a malha mais fina. Use uma medida consistente de tamanho de malha.</p><div class="grid">
+<div class="field"><label>h1 — fina</label><input id="g_h1" type="number" step="any" value="0.01"></div><div class="field"><label>φ1 — resultado fino</label><input id="g_p1" type="number" step="any" value="100"></div>
+<div class="field"><label>h2 — média</label><input id="g_h2" type="number" step="any" value="0.0141421356"></div><div class="field"><label>φ2 — resultado médio</label><input id="g_p2" type="number" step="any" value="102"></div>
+<div class="field"><label>h3 — grossa</label><input id="g_h3" type="number" step="any" value="0.02"></div><div class="field"><label>φ3 — resultado grosso</label><input id="g_p3" type="number" step="any" value="106"></div>
+</div><div class="actions"><button class="calc" onclick="calcGCI()">Calcular</button></div><div id="g_out" class="result"></div>
+<p class="formula">p aparente por iteração de três malhas · φext21 = (r21^p φ1 − φ2)/(r21^p − 1) · GCI21 = 1,25·ea21/(r21^p − 1)</p><p class="muted">Implementação baseada no procedimento clássico de três malhas. Oscilação de sinal, razões de refinamento muito próximas de 1 ou resultados não monotônicos exigem análise adicional.</p></div></section>
+
+<section id="thermal" class="tool"><div class="card"><h2>Convecção térmica</h2><div class="grid">
+<div class="field"><label>h [W/m²·K]</label><input id="t_h" type="number" step="any" value="25"></div>
+<div class="field"><label>Área A [m²]</label><input id="t_a" type="number" step="any" value="1"></div>
+<div class="field"><label>Temperatura da superfície Ts [°C]</label><input id="t_ts" type="number" step="any" value="80"></div>
+<div class="field"><label>Temperatura do fluido T∞ [°C]</label><input id="t_ti" type="number" step="any" value="25"></div>
+<div class="field"><label>Q conhecido [W] para estimar h (opcional)</label><input id="t_q" type="number" step="any" value=""></div>
+</div><div class="actions"><button class="calc" onclick="calcThermal()">Calcular</button></div><div id="t_out" class="result"></div><p class="formula">q'' = h(Ts − T∞) · Q = hA(Ts − T∞) · h = Q/[A(Ts − T∞)]</p></div></section>
+
+<section id="units" class="tool"><div class="card"><h2>Conversor de unidades</h2><div class="grid">
+<div class="field"><label>Grandeza</label><select id="u_kind" onchange="fillUnits()"><option value="pressure">Pressão</option><option value="velocity">Velocidade</option><option value="length">Comprimento</option><option value="temperature">Temperatura</option><option value="flow">Vazão volumétrica</option><option value="force">Força</option><option value="torque">Torque</option></select></div>
+<div class="field"><label>Valor</label><input id="u_val" type="number" step="any" value="1"></div>
+<div class="field"><label>De</label><select id="u_from"></select></div><div class="field"><label>Para</label><select id="u_to"></select></div>
+</div><div class="actions"><button class="calc" onclick="calcUnits()">Converter</button></div><div id="u_out" class="result"></div></div></section>
+</div>
+<script>
+const n=id=>Number(document.getElementById(id).value), fmt=(x,d=6)=>Number.isFinite(x)?Number(x).toLocaleString('pt-BR',{maximumSignificantDigits:d}):'—';
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tool').forEach(x=>x.classList.toggle('on',x.id===b.dataset.t))});
+function calcFlow(){let rho=n('f_rho'),mu=n('f_mu'),U=n('f_u'),L=n('f_l'),a=n('f_a');let Re=rho*U*L/mu,M=U/a,q=.5*rho*U*U;f_out.innerHTML=`<b>Re = ${fmt(Re)}</b><br>Mach = ${fmt(M)}<br>Pressão dinâmica q = ${fmt(q)} Pa`;}
+function calcYplus(){let rho=n('y_rho'),mu=n('y_mu'),U=n('y_u'),L=n('y_l'),yt=n('y_target');let Re=rho*U*L/mu;let Cf=y_corr.value==='one7'?.026/Math.pow(Re,1/7):.0592/Math.pow(Re,1/5);let ut=U*Math.sqrt(Cf/2),y=yt*mu/(rho*ut);y_out.innerHTML=`Re = ${fmt(Re)}<br>Cf estimado = ${fmt(Cf)}<br>uτ = ${fmt(ut)} m/s<br><b>Distância ao centro da 1ª célula y = ${fmt(y)} m (${fmt(y*1000)} mm)</b><br>Espessura inicial aproximada ≈ ${fmt(2*y*1000)} mm`;}
+function calcCFL(){let U=n('c_u'),dx=n('c_dx'),ct=n('c_target'),dt=n('c_dt'),rpm=n('c_rpm'),deg=n('c_deg');let dtc=ct*dx/U,co=U*dt/dx,dtr=deg/(6*rpm);c_out.innerHTML=`Δt para CFL alvo = <b>${fmt(dtc)} s</b><br>CFL com Δt atual = ${fmt(co)}<br>Δt para ${fmt(deg)}°/passo a ${fmt(rpm)} rpm = <b>${fmt(dtr)} s</b>`;}
+function calcCoef(){let rho=n('d_rho'),U=n('d_u'),A=n('d_a'),Fd=n('d_fd'),Fl=n('d_fl'),C=n('d_c');let den=.5*rho*U*U*A;d_out.innerHTML=`Pressão dinâmica × área = ${fmt(den)} N<br>Cd = <b>${fmt(Fd/den)}</b><br>Cl = <b>${fmt(Fl/den)}</b><br>Força para C=${fmt(C)}: <b>${fmt(C*den)} N</b>`;}
+function calcGCI(){let h1=n('g_h1'),h2=n('g_h2'),h3=n('g_h3'),p1=n('g_p1'),p2=n('g_p2'),p3=n('g_p3');if(!(h1>0&&h1<h2&&h2<h3)){g_out.innerHTML='<span class="warn">Use h1 < h2 < h3.</span>';return}let r21=h2/h1,r32=h3/h2,e21=p2-p1,e32=p3-p2;if(e21===0||e32===0){g_out.innerHTML='<span class="warn">Diferenças entre soluções não podem ser zero para estimar p.</span>';return}let s=Math.sign(e32/e21),p=Math.abs(Math.log(Math.abs(e32/e21))/Math.log(r21));for(let i=0;i<80;i++){let num=Math.pow(r21,p)-s,den=Math.pow(r32,p)-s;if(num<=0||den<=0)break;let q=Math.log(num/den),pn=Math.abs((Math.log(Math.abs(e32/e21))+q)/Math.log(r21));if(!Number.isFinite(pn))break;if(Math.abs(pn-p)<1e-8){p=pn;break}p=.5*(p+pn)}let rp=Math.pow(r21,p),ext=(rp*p1-p2)/(rp-1),ea=Math.abs((p1-p2)/p1),gci=1.25*ea/(rp-1)*100;let rp32=Math.pow(r32,p),ea32=Math.abs((p2-p3)/p2),gci32=1.25*ea32/(rp32-1)*100;let asym=gci32?gci/(gci32/Math.pow(r21,p)):NaN;g_out.innerHTML=`r21 = ${fmt(r21)} · r32 = ${fmt(r32)}<br>Ordem aparente p = <b>${fmt(p)}</b><br>φ extrapolado 21 = ${fmt(ext)}<br>GCI21 (fina/média) = <b>${fmt(gci)}%</b><br>GCI32 (média/grossa) = ${fmt(gci32)}%<br>Indicador de faixa assintótica ≈ ${fmt(asym)}${s<0?'<br><span class="warn">Convergência oscilatória detectada pelo sinal das diferenças.</span>':''}`;}
+function calcThermal(){let h=n('t_h'),A=n('t_a'),Ts=n('t_ts'),Ti=n('t_ti'),Qraw=document.getElementById('t_q').value.trim(),dT=Ts-Ti;let flux=h*dT,Q=flux*A,msg=`ΔT = ${fmt(dT)} K<br>Fluxo q'' = ${fmt(flux)} W/m²<br><b>Q = ${fmt(Q)} W</b>`;if(Qraw!==''){let Qk=Number(Qraw);msg+=`<br>h estimado a partir de Q conhecido = <b>${fmt(Qk/(A*dT))} W/m²·K</b>`}t_out.innerHTML=msg;}
+const U={pressure:{Pa:1,kPa:1e3,MPa:1e6,bar:1e5,atm:101325,psi:6894.757293},velocity:{'m/s':1,'km/h':1/3.6,knot:0.514444,mph:0.44704},length:{m:1,mm:.001,cm:.01,in:.0254,ft:.3048},flow:{'m³/s':1,'m³/h':1/3600,'L/min':.001/60,cfm:.00047194745},force:{N:1,kN:1000,lbf:4.4482216153},torque:{'N·m':1,'kN·m':1000,'lbf·ft':1.3558179483}};
+function fillUnits(){let k=u_kind.value,arr=k==='temperature'?['°C','K','°F']:Object.keys(U[k]);u_from.innerHTML=arr.map(x=>`<option>${x}</option>`).join('');u_to.innerHTML=arr.map(x=>`<option>${x}</option>`).join('');u_to.selectedIndex=Math.min(1,arr.length-1);calcUnits()}
+function calcUnits(){let k=u_kind.value,v=n('u_val'),a=u_from.value,b=u_to.value,out;if(k==='temperature'){let C=a==='°C'?v:a==='K'?v-273.15:(v-32)*5/9;out=b==='°C'?C:b==='K'?C+273.15:C*9/5+32}else out=v*U[k][a]/U[k][b];u_out.innerHTML=`<b>${fmt(v)} ${a} = ${fmt(out)} ${b}</b>`}
+fillUnits();calcFlow();calcYplus();calcCFL();calcCoef();calcGCI();calcThermal();
+</script>
+</body></html>
