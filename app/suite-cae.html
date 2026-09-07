@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Q-SIM — Suite CAE</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1e293b;--muted:#64748b;--brand:#164e63;--accent:#0f766e;--line:#d8dee8;--soft:#eef2f7;--warn:#b45309;--bad:#b91c1c;--ok:#166534}
+*{box-sizing:border-box}body{margin:0;font:14px Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}header{background:var(--brand);color:#fff;padding:15px 20px;border-bottom:4px solid var(--accent)}header h1{margin:0;font-size:21px}header small{color:#d9fbf6}.wrap{max-width:1400px;margin:auto;padding:16px}.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px;border-radius:8px;margin-bottom:12px}.tabs{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}.tabs button{padding:9px 10px;border:1px solid var(--line);background:#fff;border-radius:7px;cursor:pointer}.tabs button.on{background:var(--accent);border-color:var(--accent);color:#fff}.tool{display:none}.tool.on{display:block}.card{background:#fff;border:1px solid var(--line);border-radius:9px;padding:14px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(205px,1fr));gap:10px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.field input,.field select,.field textarea{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}.field textarea{min-height:78px;resize:vertical}.actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}button.calc{padding:9px 13px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-weight:bold;cursor:pointer}.result{margin-top:12px;padding:12px;background:#eef6f5;border:1px solid #cfe7e3;border-radius:8px;line-height:1.55}.result b{color:var(--brand)}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--soft);padding:8px;border-radius:6px;overflow:auto}.muted{color:var(--muted)}.warn{color:var(--warn);font-weight:bold}.bad{color:var(--bad);font-weight:bold}.ok{color:var(--ok);font-weight:bold}.tag{display:inline-block;padding:3px 7px;border-radius:999px;background:#e0f2f1;color:#115e59;font-size:11px;font-weight:bold;margin:2px}.status{display:inline-block;padding:3px 8px;border-radius:999px;font-size:11px;font-weight:bold}.status.ok{background:#dcfce7;color:#166534}.status.warn{background:#fef3c7;color:#92400e}.status.bad{background:#fee2e2;color:#991b1b}table{width:100%;border-collapse:collapse}th,td{padding:8px;border-bottom:1px solid var(--line);text-align:left;vertical-align:top}th{background:var(--soft)}@media(max-width:720px){.wrap{padding:10px}.tabs{display:grid;grid-template-columns:repeat(2,1fr)}.tabs button{font-size:12px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>Q-SIM — Suite CAE</h1><small>8 ferramentas de engenharia para CFD, térmica, FEA e dinâmica explícita</small></header>
+<div class="wrap">
+<div class="notice">Ferramentas de apoio à engenharia. As correlações e critérios são aproximações de pré/pós-processamento e não substituem validação física, numérica, experimental ou normativa. Todos os cálculos são locais no navegador.</div>
+<div class="tabs">
+<button class="on" data-t="turb">1. Turbulência inlet</button><button data-t="moody">2. Moody / Colebrook</button><button data-t="comp">3. Compressível</button><button data-t="therm">4. Resistência térmica</button><button data-t="fea">5. FEA tensões</button><button data-t="explicit">6. Explicit Δt</button><button data-t="rotor">7. Rotor / hélice</button><button data-t="sanity">8. Sanity Check</button>
+</div>
+
+<section id="turb" class="tool on"><div class="card"><h2>1. Turbulence Inlet Calculator — k, ε e ω</h2><div class="grid">
+<div class="field"><label>Velocidade média U [m/s]</label><input id="tb_u" type="number" step="any" value="25"></div>
+<div class="field"><label>Intensidade turbulenta I [%]</label><input id="tb_i" type="number" step="any" value="5"></div>
+<div class="field"><label>Comprimento de escala ℓ [m]</label><input id="tb_l" type="number" step="any" value="0.05"></div>
+<div class="field"><label>Densidade ρ [kg/m³]</label><input id="tb_rho" type="number" step="any" value="1.225"></div>
+<div class="field"><label>Viscosidade dinâmica μ [Pa·s]</label><input id="tb_mu" type="number" step="any" value="0.00001789"></div>
+<div class="field"><label>Cμ</label><input id="tb_cmu" type="number" step="any" value="0.09"></div>
+</div><div class="actions"><button class="calc" onclick="calcTurb()">Calcular</button></div><div id="tb_out" class="result"></div>
+<p class="formula">k = 3/2 (U I)² · ε = Cμ^(3/4) k^(3/2)/ℓ · ω = √k /(Cμ^(1/4)ℓ)</p><p class="muted">Útil para entradas em k-ε e k-ω/SST. A escala de comprimento deve representar a física da entrada; não use um valor genérico sem justificativa.</p></div></section>
+
+<section id="moody" class="tool"><div class="card"><h2>2. Moody / Colebrook / perda de carga</h2><div class="grid">
+<div class="field"><label>ρ [kg/m³]</label><input id="md_rho" type="number" step="any" value="998"></div>
+<div class="field"><label>μ [Pa·s]</label><input id="md_mu" type="number" step="any" value="0.001002"></div>
+<div class="field"><label>Velocidade V [m/s]</label><input id="md_v" type="number" step="any" value="2"></div>
+<div class="field"><label>Diâmetro hidráulico D [m]</label><input id="md_d" type="number" step="any" value="0.05"></div>
+<div class="field"><label>Comprimento L [m]</label><input id="md_l" type="number" step="any" value="20"></div>
+<div class="field"><label>Rugosidade ε [m]</label><input id="md_e" type="number" step="any" value="0.000045"></div>
+<div class="field"><label>ΣK — perdas localizadas</label><input id="md_k" type="number" step="any" value="2"></div>
+</div><div class="actions"><button class="calc" onclick="calcMoody()">Calcular</button></div><div id="md_out" class="result"></div>
+<p class="formula">Re = ρVD/μ · 1/√f = -2 log10[ε/(3,7D)+2,51/(Re√f)] · Δp = (fL/D+ΣK)ρV²/2</p><p class="muted">Para Re &lt; 2300 usa-se f=64/Re. Em regime turbulento, o fator de Darcy é obtido iterativamente por Colebrook-White e comparado com Haaland.</p></div></section>
+
+<section id="comp" class="tool"><div class="card"><h2>3. Escoamento compressível — propriedades totais e choque normal</h2><div class="grid">
+<div class="field"><label>γ</label><input id="cp_g" type="number" step="any" value="1.4"></div>
+<div class="field"><label>R [J/kg·K]</label><input id="cp_r" type="number" step="any" value="287.05"></div>
+<div class="field"><label>T estática [K]</label><input id="cp_t" type="number" step="any" value="288.15"></div>
+<div class="field"><label>P estática [Pa]</label><input id="cp_p" type="number" step="any" value="101325"></div>
+<div class="field"><label>Velocidade V [m/s]</label><input id="cp_v" type="number" step="any" value="250"></div>
+</div><div class="actions"><button class="calc" onclick="calcCompressible()">Calcular</button></div><div id="cp_out" class="result"></div>
+<p class="formula">a=√(γRT) · M=V/a · T₀/T=1+(γ-1)M²/2 · P₀/P=(T₀/T)^(γ/(γ-1))</p><p class="formula">Choque normal: M₂²=[1+(γ-1)M₁²/2]/[γM₁²-(γ-1)/2]</p><p class="muted">Relações de gás perfeito, calor específico constante e escoamento isentrópico fora do choque. O bloco de choque só é aplicável para M₁ &gt; 1.</p></div></section>
+
+<section id="therm" class="tool"><div class="card"><h2>4. Resistência térmica + Biot + Fourier</h2><div class="grid">
+<div class="field"><label>Área A [m²]</label><input id="th_a" type="number" step="any" value="1"></div>
+<div class="field"><label>T quente [°C]</label><input id="th_t1" type="number" step="any" value="100"></div>
+<div class="field"><label>T fria [°C]</label><input id="th_t2" type="number" step="any" value="25"></div>
+<div class="field"><label>h interno [W/m²·K]</label><input id="th_hi" type="number" step="any" value="50"></div>
+<div class="field"><label>h externo [W/m²·K]</label><input id="th_ho" type="number" step="any" value="15"></div>
+<div class="field"><label>Camada 1: L [m]</label><input id="th_l1" type="number" step="any" value="0.01"></div><div class="field"><label>Camada 1: k [W/m·K]</label><input id="th_k1" type="number" step="any" value="16"></div>
+<div class="field"><label>Camada 2: L [m]</label><input id="th_l2" type="number" step="any" value="0"></div><div class="field"><label>Camada 2: k [W/m·K]</label><input id="th_k2" type="number" step="any" value="1"></div>
+<div class="field"><label>Camada 3: L [m]</label><input id="th_l3" type="number" step="any" value="0"></div><div class="field"><label>Camada 3: k [W/m·K]</label><input id="th_k3" type="number" step="any" value="1"></div>
+<div class="field"><label>Comprimento característico Lc [m]</label><input id="th_lc" type="number" step="any" value="0.005"></div>
+<div class="field"><label>k sólido p/ Bi [W/m·K]</label><input id="th_ks" type="number" step="any" value="16"></div>
+<div class="field"><label>Difusividade α [m²/s]</label><input id="th_alpha" type="number" step="any" value="0.000004"></div>
+<div class="field"><label>Tempo t [s]</label><input id="th_time" type="number" step="any" value="600"></div>
+</div><div class="actions"><button class="calc" onclick="calcThermalR()">Calcular</button></div><div id="th_out" class="result"></div>
+<p class="formula">Rconv=1/(hA) · Rcond=L/(kA) · Q=ΔT/Rtotal · Bi=hLc/ks · Fo=αt/Lc²</p><p class="muted">Bi &lt; 0,1 costuma sustentar a hipótese de temperatura interna aproximadamente uniforme no método lumped. Verifique geometria e definição de Lc.</p></div></section>
+
+<section id="fea" class="tool"><div class="card"><h2>5. FEA — von Mises, tensões principais e fator de segurança</h2><div class="grid">
+<div class="field"><label>σx [MPa]</label><input id="fe_sx" type="number" step="any" value="120"></div><div class="field"><label>σy [MPa]</label><input id="fe_sy" type="number" step="any" value="40"></div><div class="field"><label>σz [MPa]</label><input id="fe_sz" type="number" step="any" value="0"></div>
+<div class="field"><label>τxy [MPa]</label><input id="fe_txy" type="number" step="any" value="25"></div><div class="field"><label>τyz [MPa]</label><input id="fe_tyz" type="number" step="any" value="0"></div><div class="field"><label>τzx [MPa]</label><input id="fe_tzx" type="number" step="any" value="0"></div>
+<div class="field"><label>Limite de escoamento Sy [MPa]</label><input id="fe_y" type="number" step="any" value="250"></div>
+</div><div class="actions"><button class="calc" onclick="calcFEA()">Calcular</button></div><div id="fe_out" class="result"></div>
+<p class="formula">σvm = √{[(σx-σy)²+(σy-σz)²+(σz-σx)²+6(τxy²+τyz²+τzx²)]/2}</p><p class="muted">Fator de segurança mostrado como Sy/σvm para material dúctil sob critério de von Mises. Não substitui critérios específicos de fadiga, fratura, compósitos ou materiais frágeis.</p></div></section>
+
+<section id="explicit" class="tool"><div class="card"><h2>6. Explicit Dynamics — stable time step</h2><div class="grid">
+<div class="field"><label>Módulo E [Pa]</label><input id="ex_e" type="number" step="any" value="210000000000"></div>
+<div class="field"><label>Poisson ν</label><input id="ex_nu" type="number" step="any" value="0.3"></div>
+<div class="field"><label>Densidade ρ [kg/m³]</label><input id="ex_rho" type="number" step="any" value="7850"></div>
+<div class="field"><label>Menor dimensão do elemento Lmin [m]</label><input id="ex_l" type="number" step="any" value="0.001"></div>
+<div class="field"><label>Fator de segurança Δt</label><input id="ex_sf" type="number" step="any" value="0.9"></div>
+<div class="field"><label>Δt alvo para mass scaling [s]</label><input id="ex_target" type="number" step="any" value="0.0000002"></div>
+</div><div class="actions"><button class="calc" onclick="calcExplicit()">Calcular</button></div><div id="ex_out" class="result"></div>
+<p class="formula">G=E/[2(1+ν)] · K=E/[3(1-2ν)] · cd=√[(K+4G/3)/ρ] · Δtest≈SF·Lmin/cd</p><p class="muted">Estimativa de ordem de grandeza. O timestep real de um solver explícito depende de formulação do elemento, distorção, contatos, material e controles numéricos.</p></div></section>
+
+<section id="rotor" class="tool"><div class="card"><h2>7. Rotor / hélice / ventilador</h2><div class="grid">
+<div class="field"><label>Rotação [rpm]</label><input id="ro_rpm" type="number" step="any" value="3000"></div>
+<div class="field"><label>Diâmetro D [m]</label><input id="ro_d" type="number" step="any" value="0.5"></div>
+<div class="field"><label>Velocidade de avanço V [m/s]</label><input id="ro_v" type="number" step="any" value="20"></div>
+<div class="field"><label>Densidade ρ [kg/m³]</label><input id="ro_rho" type="number" step="any" value="1.225"></div>
+<div class="field"><label>Velocidade do som a [m/s]</label><input id="ro_a" type="number" step="any" value="343"></div>
+<div class="field"><label>Nº de pás Z</label><input id="ro_z" type="number" step="1" value="3"></div>
+<div class="field"><label>Empuxo T [N]</label><input id="ro_t" type="number" step="any" value="100"></div>
+<div class="field"><label>Torque Q [N·m]</label><input id="ro_q" type="number" step="any" value="10"></div>
+<div class="field"><label>Potência P [W] (0 = usar torque)</label><input id="ro_p" type="number" step="any" value="0"></div>
+</div><div class="actions"><button class="calc" onclick="calcRotor()">Calcular</button></div><div id="ro_out" class="result"></div>
+<p class="formula">n=rpm/60 · J=V/(nD) · CT=T/(ρn²D⁴) · CQ=Q/(ρn²D⁵) · CP=P/(ρn³D⁵) · η=JCT/CP</p></div></section>
+
+<section id="sanity" class="tool"><div class="card"><h2>8. Simulation Sanity Check</h2><div class="grid">
+<div class="field"><label>Tipo de análise</label><select id="sc_type"><option value="cfd">CFD</option><option value="thermal">Térmica</option><option value="fea">FEA estrutural</option><option value="explicit">Explicit Dynamics</option></select></div>
+<div class="field"><label>Resíduo final máximo</label><input id="sc_res" type="number" step="any" value="0.0001"></div>
+<div class="field"><label>Desequilíbrio massa/energia [%]</label><input id="sc_bal" type="number" step="any" value="0.5"></div>
+<div class="field"><label>y+ característico</label><input id="sc_y" type="number" step="any" value="1"></div>
+<div class="field"><label>CFL característico</label><input id="sc_cfl" type="number" step="any" value="1"></div>
+<div class="field"><label>Qualidade mínima da malha [0-1]</label><input id="sc_mesh" type="number" step="any" value="0.2"></div>
+<div class="field"><label>GCI / variação de malha [%]</label><input id="sc_gci" type="number" step="any" value="3"></div>
+<div class="field"><label>Fator de segurança FEA</label><input id="sc_fos" type="number" step="any" value="1.5"></div>
+<div class="field"><label>Energia cinética / interna [%] (Explicit)</label><input id="sc_ke" type="number" step="any" value="5"></div>
+<div class="field"><label>Observação / critério do projeto</label><textarea id="sc_note" placeholder="Ex.: SST com y+≈1; benchmark experimental disponível; carregamento quase-estático..."></textarea></div>
+</div><div class="actions"><button class="calc" onclick="runSanity()">Executar auditoria</button></div><div id="sc_out" class="result"></div>
+<p class="muted">Os limites abaixo são heurísticas de triagem, não Gates automáticos de conformidade. O critério final deve ser definido pela física, solver, modelo e requisito do projeto.</p></div></section>
+</div>
+<script>
+const n=id=>Number(document.getElementById(id).value), fmt=(x,d=7)=>Number.isFinite(x)?Number(x).toLocaleString('pt-BR',{maximumSignificantDigits:d}):'—';
+document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.classList.toggle('on',x===b));document.querySelectorAll('.tool').forEach(x=>x.classList.toggle('on',x.id===b.dataset.t))});
+function calcTurb(){let U=n('tb_u'),I=n('tb_i')/100,L=n('tb_l'),rho=n('tb_rho'),mu=n('tb_mu'),cmu=n('tb_cmu');if(!(U>=0&&I>=0&&L>0&&rho>0&&mu>0&&cmu>0)){tb_out.innerHTML='<span class="bad">Entradas inválidas.</span>';return}let k=1.5*Math.pow(U*I,2),eps=Math.pow(cmu,.75)*Math.pow(k,1.5)/L,omega=Math.sqrt(k)/(Math.pow(cmu,.25)*L),mut=rho*cmu*k*k/eps,ratio=mut/mu;tb_out.innerHTML=`<b>k = ${fmt(k)} m²/s²</b><br>ε = ${fmt(eps)} m²/s³<br>ω = ${fmt(omega)} 1/s<br>μt ≈ ${fmt(mut)} Pa·s<br>μt/μ ≈ ${fmt(ratio)}`}
+function colebrook(Re,rr){let f=.25/Math.pow(Math.log10(rr/3.7+5.74/Math.pow(Re,.9)),2);for(let i=0;i<60;i++){let fn=1/Math.pow(-2*Math.log10(rr/3.7+2.51/(Re*Math.sqrt(f))),2);if(Math.abs(fn-f)<1e-12){f=fn;break}f=fn}return f}
+function calcMoody(){let rho=n('md_rho'),mu=n('md_mu'),V=n('md_v'),D=n('md_d'),L=n('md_l'),e=n('md_e'),K=n('md_k');if(!(rho>0&&mu>0&&V>=0&&D>0&&L>=0&&e>=0&&K>=0)){md_out.innerHTML='<span class="bad">Entradas inválidas.</span>';return}let Re=rho*V*D/mu,rr=e/D,f=Re>0?(Re<2300?64/Re:colebrook(Re,rr)):0,fh=Re>=2300?1/Math.pow(-1.8*Math.log10(Math.pow(rr/3.7,1.11)+6.9/Re),2):f,q=.5*rho*V*V,dpD=f*L/D*q,dpK=K*q,dp=dpD+dpK,h=dp/(rho*9.80665),Q=V*Math.PI*D*D/4;let regime=Re<2300?'laminar':Re<4000?'transição':'turbulento';md_out.innerHTML=`Re = <b>${fmt(Re)}</b> (${regime})<br>ε/D = ${fmt(rr)}<br>f Darcy (Colebrook/laminar) = <b>${fmt(f)}</b><br>f Haaland = ${fmt(fh)}<br>Δp distribuída = ${fmt(dpD)} Pa<br>Δp localizada = ${fmt(dpK)} Pa<br><b>Δp total = ${fmt(dp)} Pa</b><br>Perda de carga = ${fmt(h)} m<br>Vazão = ${fmt(Q)} m³/s`}
+function calcCompressible(){let g=n('cp_g'),R=n('cp_r'),T=n('cp_t'),P=n('cp_p'),V=n('cp_v');if(!(g>1&&R>0&&T>0&&P>0&&V>=0)){cp_out.innerHTML='<span class="bad">Entradas inválidas.</span>';return}let a=Math.sqrt(g*R*T),M=V/a,tr=1+(g-1)*M*M/2,pr=Math.pow(tr,g/(g-1)),rr=Math.pow(tr,1/(g-1)),T0=T*tr,P0=P*pr,rho=P/(R*T);let shock='';if(M>1){let M2=Math.sqrt((1+(g-1)*M*M/2)/(g*M*M-(g-1)/2)),p21=1+2*g/(g+1)*(M*M-1),r21=((g+1)*M*M)/((g-1)*M*M+2),t21=p21/r21;let p01=P*Math.pow(1+(g-1)*M*M/2,g/(g-1));let p2=P*p21,T2=T*t21;let p02=p2*Math.pow(1+(g-1)*M2*M2/2,g/(g-1));shock=`<hr><b>Choque normal</b><br>M₂ = ${fmt(M2)}<br>P₂/P₁ = ${fmt(p21)}<br>ρ₂/ρ₁ = ${fmt(r21)}<br>T₂/T₁ = ${fmt(t21)}<br>P₀₂/P₀₁ = ${fmt(p02/p01)}`}else shock='<hr><span class="muted">Choque normal não aplicável porque M ≤ 1.</span>';cp_out.innerHTML=`a = ${fmt(a)} m/s<br>ρ = ${fmt(rho)} kg/m³<br><b>Mach = ${fmt(M)}</b><br>T₀ = ${fmt(T0)} K<br>P₀ = ${fmt(P0)} Pa<br>T₀/T = ${fmt(tr)}<br>P₀/P = ${fmt(pr)}<br>ρ₀/ρ = ${fmt(rr)}${shock}`}
+function calcThermalR(){let A=n('th_a'),T1=n('th_t1'),T2=n('th_t2'),hi=n('th_hi'),ho=n('th_ho'),Ls=[n('th_l1'),n('th_l2'),n('th_l3')],ks=[n('th_k1'),n('th_k2'),n('th_k3')],Lc=n('th_lc'),ksol=n('th_ks'),alpha=n('th_alpha'),time=n('th_time');if(!(A>0&&hi>0&&ho>0&&Lc>0&&ksol>0&&alpha>0&&time>=0)){th_out.innerHTML='<span class="bad">Entradas inválidas.</span>';return}let Ri=1/(hi*A),Ro=1/(ho*A),Rc=0;for(let i=0;i<3;i++){if(Ls[i]>0&&ks[i]>0)Rc+=Ls[i]/(ks[i]*A)}let Rt=Ri+Rc+Ro,Q=(T1-T2)/Rt,U=1/(Rt*A),Bi=Math.max(hi,ho)*Lc/ksol,Fo=alpha*time/(Lc*Lc);th_out.innerHTML=`R conv. interna = ${fmt(Ri)} K/W<br>R condução = ${fmt(Rc)} K/W<br>R conv. externa = ${fmt(Ro)} K/W<br><b>R total = ${fmt(Rt)} K/W</b><br>U global = ${fmt(U)} W/m²·K<br><b>Q = ${fmt(Q)} W</b><br>Bi = ${fmt(Bi)} ${Bi<.1?'<span class="status ok">lumped plausível</span>':'<span class="status warn">gradiente interno pode importar</span>'}<br>Fo = ${fmt(Fo)}`}
+function eigSym3(a){let A=a.map(r=>r.slice());for(let it=0;it<60;it++){let p=0,q=1,max=Math.abs(A[0][1]);for(let i=0;i<3;i++)for(let j=i+1;j<3;j++)if(Math.abs(A[i][j])>max){max=Math.abs(A[i][j]);p=i;q=j}if(max<1e-12)break;let phi=.5*Math.atan2(2*A[p][q],A[q][q]-A[p][p]),c=Math.cos(phi),s=Math.sin(phi),app=c*c*A[p][p]-2*s*c*A[p][q]+s*s*A[q][q],aqq=s*s*A[p][p]+2*s*c*A[p][q]+c*c*A[q][q];for(let k=0;k<3;k++)if(k!==p&&k!==q){let akp=A[k][p],akq=A[k][q];A[k][p]=A[p][k]=c*akp-s*akq;A[k][q]=A[q][k]=s*akp+c*akq}A[p][p]=app;A[q][q]=aqq;A[p][q]=A[q][p]=0}return [A[0][0],A[1][1],A[2][2]].sort((x,y)=>y-x)}
+function calcFEA(){let sx=n('fe_sx'),sy=n('fe_sy'),sz=n('fe_sz'),txy=n('fe_txy'),tyz=n('fe_tyz'),tzx=n('fe_tzx'),Sy=n('fe_y');let vm=Math.sqrt(((sx-sy)**2+(sy-sz)**2+(sz-sx)**2+6*(txy*txy+tyz*tyz+tzx*tzx))/2),pr=eigSym3([[sx,txy,tzx],[txy,sy,tyz],[tzx,tyz,sz]]),tau=(pr[0]-pr[2])/2,fos=vm>0?Sy/vm:Infinity;fe_out.innerHTML=`<b>σ von Mises = ${fmt(vm)} MPa</b><br>σ₁ = ${fmt(pr[0])} MPa<br>σ₂ = ${fmt(pr[1])} MPa<br>σ₃ = ${fmt(pr[2])} MPa<br>τmax = ${fmt(tau)} MPa<br>Fator de segurança Sy/σvm = <b>${fmt(fos)}</b> ${fos>=1?'<span class="status ok">acima de 1</span>':'<span class="status bad">abaixo de 1</span>'}`}
+function calcExplicit(){let E=n('ex_e'),nu=n('ex_nu'),rho=n('ex_rho'),L=n('ex_l'),sf=n('ex_sf'),target=n('ex_target');if(!(E>0&&nu>-1&&nu<.5&&rho>0&&L>0&&sf>0&&target>0)){ex_out.innerHTML='<span class="bad">Entradas inválidas.</span>';return}let G=E/(2*(1+nu)),K=E/(3*(1-2*nu)),M=K+4*G/3,cd=Math.sqrt(M/rho),cs=Math.sqrt(G/rho),dt=sf*L/cd,rhoReq=M*Math.pow(target/(sf*L),2),massFactor=rhoReq/rho;ex_out.innerHTML=`G = ${fmt(G)} Pa<br>K = ${fmt(K)} Pa<br>Velocidade dilatacional cd = <b>${fmt(cd)} m/s</b><br>Velocidade de cisalhamento cs = ${fmt(cs)} m/s<br><b>Δt estável estimado = ${fmt(dt)} s</b><br>Para Δt alvo: ρ efetiva ≈ ${fmt(rhoReq)} kg/m³<br>Fator de densidade/mass scaling ≈ <b>${fmt(massFactor)}</b> ${massFactor>1?'<span class="status warn">aumento de massa</span>':'<span class="status ok">sem aumento necessário pela estimativa</span>'}`}
+function calcRotor(){let rpm=n('ro_rpm'),D=n('ro_d'),V=n('ro_v'),rho=n('ro_rho'),a=n('ro_a'),Z=n('ro_z'),T=n('ro_t'),Q=n('ro_q'),Pin=n('ro_p');if(!(rpm>0&&D>0&&rho>0&&a>0&&Z>0)){ro_out.innerHTML='<span class="bad">Entradas inválidas.</span>';return}let rev=rpm/60,omega=2*Math.PI*rev,tip=Math.PI*D*rev,rel=Math.sqrt(V*V+tip*tip),Mtip=rel/a,J=V/(rev*D),P=Pin>0?Pin:Q*omega,Ct=T/(rho*rev*rev*Math.pow(D,4)),Cq=Q/(rho*rev*rev*Math.pow(D,5)),Cp=P/(rho*Math.pow(rev,3)*Math.pow(D,5)),eta=Cp!==0?J*Ct/Cp:NaN,bpf=Z*rev;ro_out.innerHTML=`n = ${fmt(rev)} 1/s · ω = ${fmt(omega)} rad/s<br>Tip speed = ${fmt(tip)} m/s<br>Velocidade relativa de ponta ≈ ${fmt(rel)} m/s<br><b>Tip Mach ≈ ${fmt(Mtip)}</b><br>Advance ratio J = <b>${fmt(J)}</b><br>CT = ${fmt(Ct)}<br>CQ = ${fmt(Cq)}<br>CP = ${fmt(Cp)}<br>Eficiência propulsiva η ≈ ${fmt(eta)}<br>Blade Passing Frequency = <b>${fmt(bpf)} Hz</b><br>Potência usada = ${fmt(P)} W`}
+function status(label,level,msg){return `<tr><td>${label}</td><td><span class="status ${level}">${level==='ok'?'OK':level==='warn'?'ATENÇÃO':'REVISAR'}</span></td><td>${msg}</td></tr>`}
+function runSanity(){let type=sc_type.value,res=n('sc_res'),bal=n('sc_bal'),y=n('sc_y'),cfl=n('sc_cfl'),mesh=n('sc_mesh'),gci=n('sc_gci'),fos=n('sc_fos'),ke=n('sc_ke'),rows=[];rows.push(status('Resíduos',res<=1e-4?'ok':res<=1e-3?'warn':'bad',`máximo informado: ${fmt(res)}`));rows.push(status('Balanço global',Math.abs(bal)<=1?'ok':Math.abs(bal)<=3?'warn':'bad',`desequilíbrio: ${fmt(bal)}%`));rows.push(status('Qualidade mínima de malha',mesh>=.2?'ok':mesh>=.1?'warn':'bad',`valor informado: ${fmt(mesh)}`));rows.push(status('Sensibilidade de malha / GCI',gci<=5?'ok':gci<=10?'warn':'bad',`${fmt(gci)}%`));if(type==='cfd'){let yl=(y>=.5&&y<=2)||(y>=30&&y<=300)?'ok':(y<5||y>20)?'warn':'bad';rows.push(status('y+',yl,`y+ informado: ${fmt(y)}; interpretar conforme tratamento de parede`));rows.push(status('CFL',cfl<=1?'ok':cfl<=5?'warn':'bad',`CFL informado: ${fmt(cfl)}; solver implícito pode tolerar valores maiores`))}if(type==='thermal')rows.push(status('Balanço de energia',Math.abs(bal)<=1?'ok':Math.abs(bal)<=3?'warn':'bad',`${fmt(bal)}%`));if(type==='fea')rows.push(status('Fator de segurança',fos>=1.5?'ok':fos>=1?'warn':'bad',`FoS informado: ${fmt(fos)}`));if(type==='explicit')rows.push(status('KE / energia interna',ke<=5?'ok':ke<=10?'warn':'bad',`${fmt(ke)}%; critério depende de quase-estático vs impacto`));let note=sc_note.value.trim();sc_out.innerHTML=`<table><thead><tr><th>Verificação</th><th>Status</th><th>Leitura</th></tr></thead><tbody>${rows.join('')}</tbody></table>${note?`<p><b>Observação do projeto:</b> ${String(note).replace(/[&<>]/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;'}[m]))}</p>`:''}<p class="muted">Resultado de triagem. Não altera Checklist/Gates da Q-SIM automaticamente.</p>`}
+calcTurb();calcMoody();calcCompressible();calcThermalR();calcFEA();calcExplicit();calcRotor();runSanity();
+</script>
+</body></html>
