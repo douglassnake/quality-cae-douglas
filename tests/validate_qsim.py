@@ -33,12 +33,8 @@ def test_public_dataset_is_anonymized():
     data = load_public_dataset()
     assert data, "dataset público vazio"
     for item in data:
-        assert re.fullmatch(r"Cliente \d{3}", item.get("c", "")), (
-            f"cliente não anonimizado: {item.get('c')!r}"
-        )
-        assert re.fullmatch(r"PROJ-\d{3}(?:-[A-Za-z0-9]+)?", item.get("i", "")), (
-            f"identificador de projeto não anonimizado: {item.get('i')!r}"
-        )
+        assert re.fullmatch(r"Cliente \d{3}", item.get("c", "")), f"cliente não anonimizado: {item.get('c')!r}"
+        assert re.fullmatch(r"PROJ-\d{3}(?:-[A-Za-z0-9]+)?", item.get("i", "")), f"identificador de projeto não anonimizado: {item.get('i')!r}"
         for doc in item.get("d", []):
             assert any(prefix in doc for prefix in (
                 "Proposta histórica", "Relatório histórico", "Resposta técnica histórica",
@@ -56,10 +52,10 @@ def test_legacy_recovery_payload_removed():
 def test_final_modules_present():
     html = read("final.html")
     required = [
-        'id="dash"', 'id="projects"', 'id="quality"',
-        'id="knowledge"', 'id="search"', 'id="documents"',
-        'id="governance"', 'function similarity', 'function renderKnowledge',
-        'function renderQuality', 'function renderSearch',
+        'id="dash"', 'id="projects"', 'id="quality"', 'id="knowledge"',
+        'id="search"', 'id="documents"', 'id="governance"',
+        'function similarity', 'function renderKnowledge', 'function renderQuality',
+        'function renderSearch',
     ]
     missing = [x for x in required if x not in html]
     assert not missing, f"módulos ausentes em final.html: {missing}"
@@ -91,17 +87,30 @@ def test_material_properties_module_present():
     assert not missing, f"propriedades de materiais ausentes: {missing}"
 
 
+def test_advanced_tools_present():
+    html = read("advanced.html")
+    required = [
+        "Inflation Layer", "Darcy-Weisbach", "Propriedades do ar",
+        "Strouhal", "Números adimensionais térmicos",
+        "Gerador de condições de contorno", "function calcInflation",
+        "function calcDarcy", "function calcAir", "function calcStrouhal",
+        "function calcThermalDim", "function genBC",
+    ]
+    missing = [x for x in required if x not in html]
+    assert not missing, f"ferramentas avançadas ausentes: {missing}"
+
+
 def test_public_shell_integrates_tools():
     shell = (ROOT / "index.html").read_text(encoding="utf-8")
-    assert "app/final.html" in shell
-    assert "app/tools.html" in shell
-    assert "app/materials.html" in shell
+    for path in ("app/final.html", "app/tools.html", "app/materials.html", "app/advanced.html"):
+        assert path in shell, f"módulo não integrado ao shell: {path}"
     assert ("Ferramentas Técnicas" in shell) or ("Ferramentas CAE/CFD" in shell)
     assert "Propriedades de Materiais" in shell
+    assert "Ferramentas Avançadas" in shell
 
 
 def test_no_old_local_dependency():
-    for name in ("final.html", "knowledge.html", "tools.html", "materials.html"):
+    for name in ("final.html", "knowledge.html", "tools.html", "materials.html", "advanced.html"):
         html = read(name)
         assert "W:\\Douglas\\PLATAFORMA_QUALIDADE" not in html
         assert "Propostas_Relatorio" not in html
