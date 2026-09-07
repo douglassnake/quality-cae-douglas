@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Q-SIM — Propriedades de Materiais</title>
+<style>
+:root{--bg:#f6f7f9;--panel:#fff;--ink:#1e293b;--muted:#64748b;--brand:#164e63;--accent:#0f766e;--line:#d8dee8;--soft:#eef2f7;--warn:#b45309}
+*{box-sizing:border-box}body{margin:0;font:14px Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink)}header{background:var(--brand);color:#fff;padding:16px 22px;border-bottom:4px solid var(--accent)}header h1{margin:0;font-size:21px}header small{color:#d9fbf6}.wrap{max-width:1150px;margin:auto;padding:18px}.card{background:#fff;border:1px solid var(--line);border-radius:9px;padding:14px;margin-bottom:12px}.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:10px}.field label{display:block;font-size:12px;color:var(--muted);margin-bottom:4px}.field input,.field select{width:100%;padding:9px;border:1px solid #cbd5e1;border-radius:6px;background:#fff}.actions{margin-top:12px;display:flex;gap:8px;flex-wrap:wrap}.calc{padding:9px 13px;border:0;border-radius:6px;background:var(--accent);color:#fff;font-weight:bold;cursor:pointer}.result{margin-top:12px;padding:12px;background:#eef6f5;border:1px solid #cfe7e3;border-radius:8px}.result b{color:var(--brand)}.muted{color:var(--muted)}.notice{background:#fff7ed;border:1px solid #fed7aa;color:#9a3412;padding:10px;border-radius:8px;margin-bottom:14px}.chips{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px}.chip{background:var(--soft);border-radius:999px;padding:4px 8px;font-size:12px}.formula{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;background:var(--soft);padding:8px;border-radius:6px;margin-top:10px;overflow:auto}@media(max-width:650px){header{padding:13px 14px}header h1{font-size:19px}.wrap{padding:12px}.grid{grid-template-columns:1fr}}
+</style>
+</head>
+<body>
+<header><h1>Q-SIM — Conversão de Propriedades de Materiais</h1><small>Propriedades mecânicas, térmicas e elétricas</small></header>
+<div class="wrap">
+<div class="notice">As conversões são dimensionais. Não convertem automaticamente uma propriedade de um material em outra. Valores reais de materiais dependem de temperatura, tratamento, orientação, composição, taxa de deformação e norma de ensaio.</div>
+<div class="card">
+<h2>Conversor</h2>
+<div class="grid">
+<div class="field"><label>Propriedade</label><select id="kind" onchange="fillUnits()"></select></div>
+<div class="field"><label>Valor</label><input id="value" type="number" step="any" value="1"></div>
+<div class="field"><label>De</label><select id="from"></select></div>
+<div class="field"><label>Para</label><select id="to"></select></div>
+</div>
+<div class="actions"><button class="calc" onclick="convert()">Converter</button></div>
+<div id="out" class="result"></div>
+</div>
+<div class="card">
+<h3>Propriedades disponíveis</h3>
+<div class="chips">
+<span class="chip">Módulo de Young</span><span class="chip">Módulo de cisalhamento</span><span class="chip">Módulo volumétrico</span><span class="chip">Tensão / resistência</span><span class="chip">Deformação</span><span class="chip">Densidade</span><span class="chip">Expansão térmica</span><span class="chip">Condutividade térmica</span><span class="chip">Calor específico</span><span class="chip">Difusividade térmica</span><span class="chip">Tenacidade à fratura</span><span class="chip">Resistividade elétrica</span><span class="chip">Condutividade elétrica</span>
+</div>
+</div>
+<div class="card">
+<h3>Notas técnicas</h3>
+<ul>
+<li><b>E, G, K, limite de escoamento e resistência à tração</b> usam dimensões de pressão.</li>
+<li><b>Deformação</b> pode ser convertida entre valor adimensional, %, e microstrain (µε).</li>
+<li><b>Coeficiente de expansão térmica</b>: 1/K e 1/°C têm a mesma magnitude por incremento; 1/°F é ajustado pelo fator 1,8.</li>
+<li><b>Tenacidade à fratura</b> é convertida mantendo a dimensão tensão·√comprimento.</li>
+<li>Escalas de dureza Rockwell, Brinell e Vickers não são incluídas como conversão direta porque não existe relação universal exata entre elas.</li>
+</ul>
+</div>
+</div>
+<script>
+const DATA={
+ young:{label:'Módulo de Young',units:{Pa:1,kPa:1e3,MPa:1e6,GPa:1e9,psi:6894.757293,ksi:6.894757293e6}},
+ shear:{label:'Módulo de cisalhamento',units:{Pa:1,kPa:1e3,MPa:1e6,GPa:1e9,psi:6894.757293,ksi:6.894757293e6}},
+ bulk:{label:'Módulo volumétrico',units:{Pa:1,kPa:1e3,MPa:1e6,GPa:1e9,psi:6894.757293,ksi:6.894757293e6}},
+ stress:{label:'Tensão / resistência mecânica',units:{Pa:1,kPa:1e3,MPa:1e6,GPa:1e9,psi:6894.757293,ksi:6.894757293e6}},
+ strain:{label:'Deformação',units:{'adimensional':1,'%':.01,'µε':1e-6,'mε':1e-3}},
+ density:{label:'Densidade',units:{'kg/m³':1,'g/cm³':1000,'kg/L':1000,'lb/ft³':16.01846337396,'lb/in³':27679.9047102}},
+ cte:{label:'Coeficiente de expansão térmica',units:{'1/K':1,'1/°C':1,'1/°F':1.8,'µm/m·K':1e-6,'µm/m·°C':1e-6,'µin/in·°F':1.8e-6}},
+ conductivity:{label:'Condutividade térmica',units:{'W/m·K':1,'W/cm·K':100,'mW/m·K':.001,'BTU/(h·ft·°F)':1.730734666}},
+ cp:{label:'Calor específico',units:{'J/kg·K':1,'kJ/kg·K':1000,'J/g·K':1000,'cal/g·°C':4184,'BTU/lb·°F':4186.8}},
+ diffusivity:{label:'Difusividade térmica',units:{'m²/s':1,'mm²/s':1e-6,'cm²/s':1e-4,'ft²/h':2.58064e-5}},
+ toughness:{label:'Tenacidade à fratura',units:{'Pa√m':1,'MPa√m':1e6,'ksi√in':1.098843e6}},
+ resistivity:{label:'Resistividade elétrica',units:{'Ω·m':1,'Ω·cm':.01,'µΩ·cm':1e-8,'nΩ·m':1e-9}},
+ econductivity:{label:'Condutividade elétrica',units:{'S/m':1,'kS/m':1e3,'MS/m':1e6,'S/cm':100}}
+};
+const kind=document.getElementById('kind'),from=document.getElementById('from'),to=document.getElementById('to'),value=document.getElementById('value'),out=document.getElementById('out');
+const fmt=x=>Number.isFinite(x)?Number(x).toLocaleString('pt-BR',{maximumSignificantDigits:9}):'—';
+Object.entries(DATA).forEach(([k,v])=>kind.insertAdjacentHTML('beforeend',`<option value="${k}">${v.label}</option>`));
+function fillUnits(){const u=Object.keys(DATA[kind.value].units);from.innerHTML=u.map(x=>`<option>${x}</option>`).join('');to.innerHTML=u.map(x=>`<option>${x}</option>`).join('');to.selectedIndex=Math.min(1,u.length-1);convert()}
+function convert(){const d=DATA[kind.value],v=Number(value.value),a=from.value,b=to.value;base=v*d.units[a];const r=base/d.units[b];out.innerHTML=`<b>${fmt(v)} ${a} = ${fmt(r)} ${b}</b><br><span class="muted">${d.label}</span>`}
+fillUnits();
+</script>
+</body></html>
