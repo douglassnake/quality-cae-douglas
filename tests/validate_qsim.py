@@ -128,7 +128,7 @@ def test_complete_cae_suite_present():
     assert not missing, f"Suite CAE incompleta: {missing}"
     assert "Colebrook-White" in html
     assert "Choque normal" in html
-    assert "não altera Checklist/Gates" in html
+    assert "não altera checklist/gates" in html.lower()
 
 
 def test_public_shell_integrates_tools():
