@@ -1,11 +1,14 @@
 <!doctype html>
 <html lang="pt-BR">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1">
-<meta http-equiv="refresh" content="0; url=app/final.html">
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <title>Q-SIM</title>
-<style>body{font-family:Arial,Helvetica,sans-serif;background:#f6f7f9;color:#1e293b;display:grid;place-items:center;min-height:100vh;margin:0}.box{background:#fff;border:1px solid #d8dee8;border-radius:10px;padding:24px;max-width:560px}a{color:#0f766e;font-weight:bold}</style>
+<style>
+html,body{margin:0;height:100%;font-family:Arial,Helvetica,sans-serif;background:#0f2f3b}body{display:grid;grid-template-rows:48px 1fr}.bar{display:flex;align-items:center;gap:8px;padding:7px 12px;background:#0f2f3b;border-bottom:2px solid #0f766e}.brand{color:#fff;font-weight:bold;margin-right:auto}.bar button{border:1px solid #44717a;background:transparent;color:#e6f6f4;border-radius:6px;padding:7px 11px;cursor:pointer}.bar button.on{background:#0f766e;border-color:#0f766e;color:#fff}iframe{width:100%;height:100%;border:0;background:#f6f7f9}
+</style>
 </head>
-<body><div class="box"><h1>Q-SIM</h1><p>Abrindo a Plataforma de Qualidade CAE...</p><p><a href="app/final.html">Clique aqui se o redirecionamento não ocorrer.</a></p></div></body>
-</html>
+<body>
+<div class="bar"><span class="brand">Q-SIM</span><button class="on" data-src="app/final.html">Plataforma</button><button data-src="app/tools.html">Ferramentas Técnicas</button></div>
+<iframe id="view" src="app/final.html" title="Q-SIM"></iframe>
+<script>document.querySelectorAll('.bar button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.bar button').forEach(x=>x.classList.toggle('on',x===b));view.src=b.dataset.src})</script>
+</body></html>

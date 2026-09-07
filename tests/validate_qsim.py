@@ -65,8 +65,29 @@ def test_final_modules_present():
     assert not missing, f"módulos ausentes em final.html: {missing}"
 
 
+def test_technical_tools_present():
+    html = read("tools.html")
+    required = [
+        "function calcFlow", "function calcYplus", "function calcCFL",
+        "function calcCoef", "function calcGCI", "function calcThermal",
+        "function calcUnits", "Grid Convergence Index", "DecompressionStream" if False else "CFL",
+    ]
+    missing = [x for x in required if x not in html]
+    assert not missing, f"ferramentas técnicas ausentes: {missing}"
+    assert "Cf = 0,026 Re^(-1/7)" in html
+    assert "1,25" in html, "fator de segurança GCI não documentado na interface"
+    assert "Nenhum dado digitado é enviado para servidor" in html
+
+
+def test_public_shell_integrates_tools():
+    shell = (ROOT / "index.html").read_text(encoding="utf-8")
+    assert "app/final.html" in shell
+    assert "app/tools.html" in shell
+    assert "Ferramentas Técnicas" in shell
+
+
 def test_no_old_local_dependency():
-    for name in ("final.html", "knowledge.html"):
+    for name in ("final.html", "knowledge.html", "tools.html"):
         html = read(name)
         assert "W:\\Douglas\\PLATAFORMA_QUALIDADE" not in html
         assert "Propostas_Relatorio" not in html
