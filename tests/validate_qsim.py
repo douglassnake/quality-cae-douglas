@@ -1,4 +1,7 @@
 from pathlib import Path
+import base64
+import gzip
+import json
 import re
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -11,11 +14,43 @@ def read(name: str) -> str:
     return p.read_text(encoding="utf-8")
 
 
+def load_public_dataset():
+    html = read("index.html")
+    m = re.search(r'const P="([A-Za-z0-9+/=]+)"', html)
+    assert m, "base compactada P não localizada em app/index.html"
+    raw = gzip.decompress(base64.b64decode(m.group(1))).decode("utf-8")
+    return json.loads(raw)
+
+
 def test_recovery_base_present():
     html = read("index.html")
     m = re.search(r'const P="([A-Za-z0-9+/=]+)"', html)
     assert m, "base compactada P não localizada em app/index.html"
     assert len(m.group(1)) > 1000, "base compactada parece vazia/truncada"
+
+
+def test_public_dataset_is_anonymized():
+    data = load_public_dataset()
+    assert data, "dataset público vazio"
+    for item in data:
+        assert re.fullmatch(r"Cliente \d{3}", item.get("c", "")), (
+            f"cliente não anonimizado: {item.get('c')!r}"
+        )
+        assert re.fullmatch(r"PROJ-\d{3}(?:-[A-Za-z0-9]+)?", item.get("i", "")), (
+            f"identificador de projeto não anonimizado: {item.get('i')!r}"
+        )
+        for doc in item.get("d", []):
+            assert any(prefix in doc for prefix in (
+                "Proposta histórica", "Relatório histórico", "Resposta técnica histórica",
+                "Planilha técnica histórica", "Apresentação histórica", "Documento histórico",
+            )), f"referência documental não anonimizada: {doc!r}"
+
+
+def test_legacy_recovery_payload_removed():
+    legacy = APP / "data"
+    if legacy.exists():
+        files = list(legacy.glob("qsim-v6-recovery.enc.part*"))
+        assert not files, f"payloads legados ainda publicados: {files}"
 
 
 def test_final_modules_present():
