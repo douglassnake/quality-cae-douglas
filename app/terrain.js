@@ -71,6 +71,7 @@ const Terrain=(function(){
  }
  function render(){
   graph(profile);
+  if(profile.length>=2)document.getElementById("profileStatus").textContent="Perfil altimétrico: "+source+". Cotas do terreno, não necessariamente do eixo da tubulação.";
   if(profile.length<2){document.getElementById("profileSummary").textContent="Sem perfil disponível.";document.getElementById("pressureSummary").textContent="Cálculos de pressão distribuída indisponíveis.";return}
   const min=profile.reduce((a,b)=>a.z<b.z?a:b),max=profile.reduce((a,b)=>a.z>b.z?a:b),dz=profile.at(-1).z-profile[0].z;
   document.getElementById("profileSummary").textContent=source+" · Captação "+fmt(profile[0].z)+" m · Destino "+fmt(profile.at(-1).z)+" m · Mín. "+fmt(min.z)+" m em "+fmt(min.s,0)+" m · Máx. "+fmt(max.z)+" m em "+fmt(max.s,0)+" m · Δz "+fmt(dz)+" m.";
