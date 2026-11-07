@@ -16,3 +16,9 @@ jobs:
           python-version: '3.12'
       - name: Run static validation
         run: python tests/validate_qsim.py
+
+      - name: Validate simulator JavaScript syntax
+        run: |
+          node --check app/terrain.js
+          python -c 'from pathlib import Path; s=Path("app/pumps.html").read_text(); Path("/tmp/qsim-pumps-inline.js").write_text(s.split("<script>\n",1)[1].split("</script>",1)[0])'
+          node --check /tmp/qsim-pumps-inline.js
