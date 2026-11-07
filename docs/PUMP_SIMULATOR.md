@@ -30,3 +30,9 @@ Abra a aba **Bombas e Topografia** na página principal, ou diretamente `app/pum
 
 ## Evoluções
 Perfil hidráulico com linha piezométrica, aquisição opcional de modelo digital de elevação licenciado, curvas reais de bombas e testes automatizados de engenharia.
+
+## Pressão de entrada do pivô (variável)
+- Campo editável **Pressão exigida na entrada do pivô (bar)**; valor inicial 0 indica **não informado** e gera aviso.
+- Conversão física: `H_pressão = P_bar * 100000 / (rho * g)`, com `rho = 1000 kg/m³` e `g = 9,80665 m/s²`.
+- Esta parcela entra na AMT como pressão residual no ponto de entrega, sem atribuir um valor genérico a nenhum modelo de pivô.
+- Quando o fabricante informar a pressão de serviço, inserir o valor para atualizar AMT, potência e consumo. A pressão nominal depende do projeto, dos emissores e das perdas internas.
