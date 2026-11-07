@@ -55,3 +55,28 @@ A pressão manométrica em cada amostra é `HGL(s) - z_terreno(s)` em mca. As pe
 **Atenção:** MDE Copernicus GLO-90 mede relevo em resolução aproximada de 90 m, não substitui levantamento topográfico, cota da linha de centro da tubulação ou perfil hidráulico executivo. Confirmar datum vertical e direção do caminho. A pressão calculada depende diretamente da pressão requerida no pivô, que deve vir do fabricante. Não assumir a inclinação média nem o ganho acumulado como desnível terminal.
 
 Fonte: https://open-meteo.com/en/docs/elevation-api e https://open-meteo.com/en/terms (atribuição obrigatória Open-Meteo e Copernicus). A API anterior OpenTopoData foi substituída porque sua instância pública não expõe CORS para o navegador, impedindo a integração direta ao GitHub Pages.
+
+## Melhorias V0.3 — direção, inspeção e alertas
+
+### Inversão da rota
+- Botão **Inverter captação e destino** troca a ordem geométrica das coordenadas, reposiciona os marcadores de início/fim e troca o sentido do perfil.
+- Se as altitudes já foram obtidas, são reaproveitadas sem nova chamada à API, e o desnível geométrico é recalculado com sinal inverso.
+- Se o desnível for manual e não houver cotas numéricas, seu sinal é invertido e o usuário deve verificar a hipótese.
+
+### Gráfico interativo
+- Passe o cursor sobre o gráfico ou use o controle deslizante (teclado/toque) para conferir distância acumulada, cota, linha piezométrica e pressão aproximada.
+- O ponto correspondente é destacado também no mapa. Pressões só aparecem com cotas válidas e pressão do pivô >0 bar.
+
+### Alertas de engenharia
+- **Pressão negativa**: identifica amostras com HGL abaixo da cota aproximada da tubulação (estimada pelo terreno).
+- **Pressão excessiva**: apenas se o usuário informar **limite admissível da tubulação em bar**; 0 significa desconhecido e impede esse alerta.
+- **Pontos altos**: realce de máximos relevantes no perfil amostrado como **candidatos à avaliação de ar acumulado e ventosas**, sem afirmar localização de instalação.
+- As pressões são apenas estimativas em regime permanente. Não incorporam sobrepressão por golpe de aríete, transientes, NPSH, pressão de trabalho real, perdas pontuais localizadas ou profundidade de assentamento.
+
+### Homologação sugerida
+1. Carregar KML e consultar altitudes; anotar cota inicial, final, extrema e desnível.
+2. Inverter o sentido; verificar que marcadores alternam e que o novo desnível é o oposto.
+3. Informar pressão positiva do pivô e testar o gráfico por cursor e controle deslizante.
+4. Informar limite de pressão alto (sem alerta) e baixo (gerando alerta, se excedido).
+5. Reverter o sentido para captação → pivô e confirmar o traçado e as pressões.
+6. Comparar perfil com Google Earth e levantamento real, considerando resolução de 90 m.
