@@ -40,7 +40,7 @@ Perfil hidráulico com linha piezométrica, aquisição opcional de modelo digit
 ## Perfil topográfico automático e linha piezométrica (MVP 0.2)
 
 1. Importe o KML do Google Earth com caminho no sentido captação → pivô.
-2. Clique em **Obter altitudes automaticamente**. Uma requisição HTTPS do navegador consulta 80 pontos equidistantes ao longo da geometria em `api.opentopodata.org/v1/srtm30m` (SRTM 30 m). Não requer chave nem backend, mas depende da disponibilidade da API pública, conectividade, CORS e limites de uso. A API pública indica limite de 100 pontos por chamada, 1 chamada/segundo e 1000/dia.
+2. Clique em **Obter altitudes automaticamente**. Uma requisição HTTPS do navegador consulta 80 pontos equidistantes ao longo da geometria em `api.open-meteo.com/v1/elevation`, usando o Copernicus DEM GLO-90 (~90 m). A API pública informa suporte a CORS e até 100 coordenadas por chamada. Não requer backend ou chave para uso não comercial, mas depende da conectividade, disponibilidade e política de uso da Open-Meteo. Para uso comercial, verificar os termos e a modalidade de API apropriada.
 3. Se todas as amostras retornarem altitudes numéricas, o sistema mostra altitude inicial e final, mínimos e máximos, e atualiza automaticamente o desnível estático. Caso contrário, preserva os valores manuais e informa a falha.
 4. Informe pressão exigida pelo pivô em bar (valor maior que zero). O gráfico mostra a linha piezométrica estimada e o texto destaca a pressão mínima, máxima e amostras com pressão manométrica negativa.
 
@@ -52,6 +52,6 @@ A linha piezométrica para a distância acumulada `s` (comprimento geodésico `S
 
 A pressão manométrica em cada amostra é `HGL(s) - z_terreno(s)` em mca. As perdas totais, inclusive as localizadas, são distribuídas uniformemente para a **visualização preliminar**. O cálculo pressupõe uma única tubulação com diâmetro constante, escoamento permanente e pressão na entrada do pivô. Não representa pressão do solo quando a tubulação está enterrada a profundidade diferente; as cotas do solo e da linha de centro do tubo podem divergir. Não calcula golpes de aríete, NPSH, sucção, ventosas, ar aprisionado, curvas reais da bomba nem tolerâncias da rede.
 
-**Atenção:** MDE SRTM mede relevo em resolução aproximada de 30 m, não substitui levantamento topográfico, cota da linha de centro da tubulação ou perfil hidráulico executivo. Confirmar datum vertical e direção do caminho. A pressão calculada depende diretamente da pressão requerida no pivô, que deve vir do fabricante. Não assumir a inclinação média nem o ganho acumulado como desnível terminal.
+**Atenção:** MDE Copernicus GLO-90 mede relevo em resolução aproximada de 90 m, não substitui levantamento topográfico, cota da linha de centro da tubulação ou perfil hidráulico executivo. Confirmar datum vertical e direção do caminho. A pressão calculada depende diretamente da pressão requerida no pivô, que deve vir do fabricante. Não assumir a inclinação média nem o ganho acumulado como desnível terminal.
 
-Fonte: https://www.opentopodata.org/api/ e https://www.opentopodata.org/datasets/srtm/
+Fonte: https://open-meteo.com/en/docs/elevation-api e https://open-meteo.com/en/terms (atribuição obrigatória Open-Meteo e Copernicus). A API anterior OpenTopoData foi substituída porque sua instância pública não expõe CORS para o navegador, impedindo a integração direta ao GitHub Pages.
