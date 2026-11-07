@@ -30,22 +30,23 @@ const Terrain=(function(){
   const thisToken=++token;
   try{
    const sampled=sample(route,80);
-   msg("Consultando elevação do terreno (SRTM 30 m, 80 amostras)…");
-   const locations=sampled.map(p=>p.lat.toFixed(6)+","+p.lon.toFixed(6)).join("|");
-   const url="https://api.opentopodata.org/v1/srtm30m?locations="+encodeURIComponent(locations)+"&interpolation=bilinear";
-   const ctl=new AbortController();const timer=setTimeout(()=>ctl.abort(),18000);
+   msg("Consultando elevação do terreno (Copernicus GLO-90, 80 amostras)…");
+   const latitudes=sampled.map(p=>p.lat.toFixed(6)).join(",");
+   const longitudes=sampled.map(p=>p.lon.toFixed(6)).join(",");
+   const url="https://api.open-meteo.com/v1/elevation?latitude="+encodeURIComponent(latitudes)+"&longitude="+encodeURIComponent(longitudes);
+   const ctl=new AbortController();const timer=setTimeout(()=>ctl.abort(),20000);
    let response;try{response=await fetch(url,{signal:ctl.signal,mode:"cors"});}finally{clearTimeout(timer)}
-   if(!response.ok)throw Error("Serviço de elevação indisponível (HTTP "+response.status+").");
+   if(!response.ok)throw Error("Serviço Open-Meteo indisponível (HTTP "+response.status+").");
    const data=await response.json();
-   if(data.status!=="OK"||!Array.isArray(data.results)||data.results.length!==sampled.length||data.results.some(p=>!Number.isFinite(p.elevation)))throw Error("O serviço não retornou cotas válidas para todo o percurso.");
+   if(!Array.isArray(data.elevation)||data.elevation.length!==sampled.length||data.elevation.some(z=>!Number.isFinite(z)))throw Error("O serviço não retornou cotas válidas para todo o percurso.");
    if(thisToken!==token)return;
-   profile=sampled.map((p,i)=>({...p,z:data.results[i].elevation}));
-   source="SRTM 30 m · OpenTopoData";
+   profile=sampled.map((p,i)=>({...p,z:data.elevation[i]}));
+   source="Copernicus DEM GLO-90 · Open-Meteo";
    const dz=profile.at(-1).z-profile[0].z;
    document.getElementById("rise").value=dz.toFixed(2);
-   msg("Perfil obtido: 80 amostras do SRTM 30 m. Desnível geométrico atualizado automaticamente. Verifique datum e precisão do modelo.");
+   msg("Perfil obtido: 80 amostras do Copernicus GLO-90 (90 m). Desnível geométrico atualizado automaticamente. Confirme datum, direção e resolução do modelo.");
    calculate();render();
-  }catch(e){if(thisToken===token){msg("Não foi possível consultar as altitudes: "+e.message+" Use cotas do KML ou desnível manual.");if(!profile.length){render();}}}
+  }catch(e){if(thisToken===token){msg("Consulta de altitudes falhou: "+(e.name==="AbortError"?"tempo limite de 20 segundos":e.message)+". Verifique conexão, bloqueadores e disponibilidade da Open-Meteo; ou use cotas do KML/desnível manual.");if(!profile.length){render();}}}
   finally{pending=false;button.disabled=false}
  }
  function graph(data){
